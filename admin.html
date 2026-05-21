@@ -134,6 +134,10 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
       Statistiques
     </div>
+    <div class="nav-item" onclick="showPage('analyse')" id="nav-analyse">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10H12z"/></svg>
+      Analyse
+    </div>
     <div class="sidebar-bottom">
       <button class="btn-logout" onclick="logout()">Se déconnecter</button>
     </div>
@@ -260,6 +264,50 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle}
       </div>
     </div>
 
+    <!-- ANALYSE PAGE -->
+    <div class="page" id="page-analyse">
+      <div class="page-title">ANALYSE</div>
+      <div class="page-sub">Répartition détaillée de tes ventes par plateforme et service</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+
+        <!-- CAMEMBERT PLATEFORMES -->
+        <div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--white);margin-bottom:4px">PLATEFORMES</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:24px">Répartition des commandes par réseau social</div>
+          <canvas id="platformChart" height="220"></canvas>
+          <div id="platformLegend" style="margin-top:20px;display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+
+        <!-- CAMEMBERT STATUTS -->
+        <div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--white);margin-bottom:4px">STATUTS</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:24px">Répartition des commandes par statut</div>
+          <canvas id="statusChart" height="220"></canvas>
+          <div id="statusLegend" style="margin-top:20px;display:flex;flex-direction:column;gap:8px"></div>
+        </div>
+
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+
+        <!-- TOP SERVICES -->
+        <div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--white);margin-bottom:4px">TOP SERVICES</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:24px">Les services les plus commandés</div>
+          <canvas id="servicesChart" height="220"></canvas>
+        </div>
+
+        <!-- REVENUS PAR PLATEFORME -->
+        <div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--white);margin-bottom:4px">REVENUS PAR PLATEFORME</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:24px">Chiffre d'affaires par réseau social</div>
+          <canvas id="revenueByPlatformChart" height="220"></canvas>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -311,11 +359,78 @@ function logout(){
   location.reload();
 }
 
+let platformChart = null, statusChart = null, servicesChart = null, revenueByPlatformChart = null;
+
+function renderAnalyse(){
+  const orders = allOrders;
+  if(!orders.length) return;
+
+  const platColors = ['#4dff7c','#4d96ff','#ff4daa','#ffaa33','#ff4d4d','#aa4dff'];
+
+  // PLATEFORMES
+  const platCount = {};
+  orders.forEach(o => { platCount[o.platform||'Autre'] = (platCount[o.platform||'Autre']||0)+1; });
+  const platLabels = Object.keys(platCount);
+  const platData = Object.values(platCount);
+  if(platformChart) platformChart.destroy();
+  platformChart = new Chart(document.getElementById('platformChart'), {
+    type:'doughnut',
+    data:{labels:platLabels,datasets:[{data:platData,backgroundColor:platColors,borderColor:'#0f1210',borderWidth:3}]},
+    options:{plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f1210',titleColor:'#4dff7c',bodyColor:'#e5ede7',borderColor:'#1a1f1b',borderWidth:1}},cutout:'65%'}
+  });
+  document.getElementById('platformLegend').innerHTML = platLabels.map((l,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;border-radius:50%;background:${platColors[i]};flex-shrink:0"></div><span style="font-size:13px;color:var(--text)">${l}</span></div>
+      <div style="display:flex;gap:12px"><span style="font-size:12px;color:var(--text3)">${platData[i]} cmd</span><span style="font-size:12px;font-weight:600;color:${platColors[i]}">${Math.round(platData[i]/orders.length*100)||0}%</span></div>
+    </div>`).join('');
+
+  // STATUTS
+  const statCount = {pending:0,processing:0,delivered:0,cancelled:0};
+  orders.forEach(o=>{if(statCount[o.status]!==undefined)statCount[o.status]++});
+  const statLabels=['En attente','En cours','Livrées','Annulées'];
+  const statColors=['#ffaa33','#4d96ff','#4dff7c','#ff4d4d'];
+  if(statusChart) statusChart.destroy();
+  statusChart = new Chart(document.getElementById('statusChart'), {
+    type:'doughnut',
+    data:{labels:statLabels,datasets:[{data:Object.values(statCount),backgroundColor:statColors,borderColor:'#0f1210',borderWidth:3}]},
+    options:{plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f1210',titleColor:'#4dff7c',bodyColor:'#e5ede7',borderColor:'#1a1f1b',borderWidth:1}},cutout:'65%'}
+  });
+  document.getElementById('statusLegend').innerHTML = statLabels.map((l,i)=>`
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;border-radius:50%;background:${statColors[i]};flex-shrink:0"></div><span style="font-size:13px;color:var(--text)">${l}</span></div>
+      <span style="font-size:12px;font-weight:600;color:${statColors[i]}">${Object.values(statCount)[i]}</span>
+    </div>`).join('');
+
+  // TOP SERVICES
+  const svcCount={};
+  orders.forEach(o=>{svcCount[o.service]=(svcCount[o.service]||0)+1});
+  const topSvcs=Object.entries(svcCount).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  if(servicesChart) servicesChart.destroy();
+  servicesChart = new Chart(document.getElementById('servicesChart'), {
+    type:'bar',
+    data:{labels:topSvcs.map(s=>s[0].length>22?s[0].substring(0,22)+'…':s[0]),datasets:[{data:topSvcs.map(s=>s[1]),backgroundColor:'rgba(77,255,124,0.15)',borderColor:'#4dff7c',borderWidth:1.5,borderRadius:6}]},
+    options:{indexAxis:'y',plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f1210',titleColor:'#4dff7c',bodyColor:'#e5ede7',borderColor:'#1a1f1b',borderWidth:1}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4d5e50',font:{size:11}}},y:{grid:{display:false},ticks:{color:'#8fa893',font:{size:11}}}}}
+  });
+
+  // REVENUS PAR PLATEFORME
+  const platRevenue={};
+  orders.forEach(o=>{platRevenue[o.platform||'Autre']=(platRevenue[o.platform||'Autre']||0)+parseFloat(o.amount||0)});
+  const prLabels=Object.keys(platRevenue);
+  const prData=Object.values(platRevenue).map(v=>parseFloat(v.toFixed(2)));
+  if(revenueByPlatformChart) revenueByPlatformChart.destroy();
+  revenueByPlatformChart = new Chart(document.getElementById('revenueByPlatformChart'), {
+    type:'bar',
+    data:{labels:prLabels,datasets:[{data:prData,backgroundColor:platColors.map(c=>c+'33'),borderColor:platColors,borderWidth:1.5,borderRadius:8}]},
+    options:{plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f1210',titleColor:'#4dff7c',bodyColor:'#e5ede7',borderColor:'#1a1f1b',borderWidth:1,callbacks:{label:ctx=>ctx.parsed.y.toFixed(2)+'€'}}},scales:{x:{grid:{display:false},ticks:{color:'#8fa893',font:{size:11}}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4d5e50',font:{size:11},callback:v=>v+'€'}}}}
+  });
+}
+
 function showPage(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   document.getElementById('page-'+page).classList.add('active');
   document.getElementById('nav-'+page).classList.add('active');
+  if(page==='analyse') setTimeout(renderAnalyse, 100);
 }
 
 async function loadOrders(){
