@@ -143,6 +143,10 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
       Codes Promo
     </div>
+    <div class="nav-item" onclick="showPage('clients')" id="nav-clients">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Clients
+    </div>
     <div class="nav-item" onclick="showPage('traffic')" id="nav-traffic">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Trafic
@@ -270,6 +274,92 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle}
           <thead><tr><th>Code</th><th>Réduction</th><th>Utilisations</th><th>Max</th><th>Statut</th><th>Créé le</th><th>Actions</th></tr></thead>
           <tbody id="promosTable"><tr><td colspan="7"><div class="empty"><div class="empty-icon">🏷️</div><div class="empty-text">Chargement...</div></div></td></tr></tbody>
         </table>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div class="page" id="page-clients" style="display:none">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;flex-wrap:wrap;gap:16px">
+        <div>
+          <div class="page-title">CLIENTS</div>
+          <div class="page-sub">Gérez tous vos clients inscrits</div>
+        </div>
+        <input type="text" class="search-input" placeholder="🔍 Rechercher un client..." oninput="searchClients(this.value)" style="width:260px">
+      </div>
+
+      <!-- STATS CLIENTS -->
+      <div class="stats-row" style="margin-bottom:24px">
+        <div class="stat-card"><div class="stat-label">Total clients</div><div class="stat-value green" id="c-total">—</div><div class="stat-sub">Inscrits</div></div>
+        <div class="stat-card"><div class="stat-label">Nouveaux ce mois</div><div class="stat-value" id="c-new">—</div><div class="stat-sub">Ce mois-ci</div></div>
+        <div class="stat-card"><div class="stat-label">Clients actifs</div><div class="stat-value green" id="c-active">—</div><div class="stat-sub">Ont commandé</div></div>
+        <div class="stat-card"><div class="stat-label">CA moyen/client</div><div class="stat-value green" id="c-avg">—</div><div class="stat-sub">Par client</div></div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Inscription</th>
+              <th>Commandes</th>
+              <th>Total dépensé</th>
+              <th>Dernier achat</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="clientsTable">
+            <tr><td colspan="8"><div class="empty"><div class="empty-icon">👥</div><div class="empty-text">Chargement...</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- MODAL CLIENT -->
+    <div id="clientModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.85);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px">
+      <div style="background:var(--card2);border:1px solid var(--line2);border-radius:20px;padding:36px;width:100%;max-width:480px;position:relative">
+        <button onclick="closeClientModal()" style="position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:6px;border:1px solid var(--line);background:none;color:var(--text3);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center">×</button>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--white);margin-bottom:4px" id="modal-client-name">—</div>
+        <div style="font-size:13px;color:var(--text3);margin-bottom:24px" id="modal-client-email">—</div>
+
+        <!-- CLIENT STATS -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:24px">
+          <div style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Commandes</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--white)" id="modal-orders">0</div>
+          </div>
+          <div style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Dépensé</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--green)" id="modal-spent">0€</div>
+          </div>
+          <div style="background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;text-align:center">
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Membre depuis</div>
+            <div style="font-size:12px;color:var(--text2);font-weight:600;margin-top:4px" id="modal-since">—</div>
+          </div>
+        </div>
+
+        <!-- RESET PASSWORD -->
+        <div style="background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px">
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px">🔑 Nouveau mot de passe</div>
+          <div style="display:flex;gap:8px">
+            <input type="password" id="new-password" placeholder="Nouveau mot de passe..." style="flex:1;background:var(--card);border:1px solid var(--line);color:var(--white);padding:10px 13px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none">
+            <button onclick="resetPassword()" style="background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);padding:10px 16px;border-radius:8px;font-size:12px;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;cursor:pointer;white-space:nowrap;transition:all .2s" onmouseover="this.style.background='var(--green)';this.style.color='#020902'" onmouseout="this.style.background='var(--green-dim)';this.style.color='var(--green)'">DÉFINIR</button>
+          </div>
+          <div id="password-msg" style="font-size:12px;margin-top:8px;display:none"></div>
+        </div>
+
+        <!-- ORDERS HISTORY -->
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text);margin-bottom:12px;text-transform:uppercase;letter-spacing:.5px">📦 Historique des commandes</div>
+          <div id="modal-orders-list" style="display:flex;flex-direction:column;gap:8px;max-height:200px;overflow-y:auto"></div>
+        </div>
+
+        <!-- DELETE -->
+        <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--line)">
+          <button onclick="deleteClient()" style="background:rgba(255,77,77,.1);border:1px solid rgba(255,77,77,.2);color:var(--red);padding:9px 18px;border-radius:8px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,77,77,.2)'" onmouseout="this.style.background='rgba(255,77,77,.1)'">🗑 Supprimer ce compte</button>
+        </div>
       </div>
     </div>
 
@@ -430,6 +520,7 @@ function showPage(page){
   if(navEl) navEl.classList.add('active');
   if(page==='analyse') setTimeout(renderAnalyse, 100);
   if(page==='promos') loadPromos();
+  if(page==='clients') loadClients();
 }
 
 async function loadOrders(){
@@ -784,6 +875,159 @@ async function deletePromo(id){
   });
   loadPromos();
   showToast('Code supprimé');
+}
+
+/* ── CLIENTS ── */
+let allClients = [];
+let currentClientId = null;
+
+async function loadClients(){
+  try {
+    const [usersRes, ordersRes] = await Promise.all([
+      fetch(`${API}/api/admin/users`,{headers:{'Authorization':'Bearer '+token}}),
+      fetch(`${API}/api/admin/orders`,{headers:{'Authorization':'Bearer '+token}})
+    ]);
+    allClients = await usersRes.json();
+    const orders = await ordersRes.json();
+
+    // Enrich clients with order data
+    allClients = allClients.map(u => {
+      const userOrders = orders.filter(o => o.email === u.email || o.user_id === u.id);
+      const spent = userOrders.reduce((s,o) => s+parseFloat(o.amount||0), 0);
+      const lastOrder = userOrders.sort((a,b) => new Date(b.created_at)-new Date(a.created_at))[0];
+      return {...u, orders: userOrders, spent, lastOrder};
+    });
+
+    // Stats
+    const now = new Date();
+    const newThisMonth = allClients.filter(u => {
+      const d = new Date(u.created_at);
+      return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear();
+    }).length;
+    const active = allClients.filter(u => u.orders.length > 0).length;
+    const totalSpent = allClients.reduce((s,u) => s+u.spent, 0);
+    const avgSpent = allClients.length ? (totalSpent/allClients.length).toFixed(2) : '0.00';
+
+    document.getElementById('c-total').textContent = allClients.length;
+    document.getElementById('c-new').textContent = newThisMonth;
+    document.getElementById('c-active').textContent = active;
+    document.getElementById('c-avg').textContent = avgSpent+'€';
+
+    renderClients(allClients);
+  } catch(e) { showToast('Erreur chargement clients'); }
+}
+
+function renderClients(clients){
+  const tbody = document.getElementById('clientsTable');
+  if(!clients.length){
+    tbody.innerHTML='<tr><td colspan="8"><div class="empty"><div class="empty-icon">👥</div><div class="empty-text">Aucun client inscrit</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = clients.map(u => `
+    <tr style="cursor:pointer" onclick="openClientModal(${u.id})">
+      <td class="td-id">#${u.id}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;border-radius:50%;background:var(--green-dim);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--green);flex-shrink:0">${(u.name||'?')[0].toUpperCase()}</div>
+          <div style="font-size:13px;font-weight:600;color:var(--text)">${u.name||'—'}</div>
+        </div>
+      </td>
+      <td class="td-link">${u.email}</td>
+      <td class="td-date">${new Date(u.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'})}</td>
+      <td>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--white)">${u.orders.length}</span>
+        <span style="font-size:10px;color:var(--text3);margin-left:3px">cmd</span>
+      </td>
+      <td>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--green)">${u.spent.toFixed(2)}€</span>
+      </td>
+      <td class="td-date">${u.lastOrder ? new Date(u.lastOrder.created_at).toLocaleDateString('fr-FR') : '—'}</td>
+      <td>
+        <button onclick="event.stopPropagation();openClientModal(${u.id})" style="background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif">Gérer</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function searchClients(q){
+  const filtered = allClients.filter(u =>
+    u.name?.toLowerCase().includes(q.toLowerCase()) ||
+    u.email?.toLowerCase().includes(q.toLowerCase())
+  );
+  renderClients(filtered);
+}
+
+function openClientModal(id){
+  const u = allClients.find(u => u.id === id);
+  if(!u) return;
+  currentClientId = id;
+
+  document.getElementById('modal-client-name').textContent = u.name || '—';
+  document.getElementById('modal-client-email').textContent = u.email;
+  document.getElementById('modal-orders').textContent = u.orders.length;
+  document.getElementById('modal-spent').textContent = u.spent.toFixed(2)+'€';
+  document.getElementById('modal-since').textContent = new Date(u.created_at).toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+  document.getElementById('new-password').value = '';
+  document.getElementById('password-msg').style.display = 'none';
+
+  // Orders list
+  const list = document.getElementById('modal-orders-list');
+  if(!u.orders.length){
+    list.innerHTML = '<div style="font-size:13px;color:var(--text3);text-align:center;padding:16px">Aucune commande</div>';
+  } else {
+    list.innerHTML = u.orders.slice(0,5).map(o => `
+      <div style="display:flex;align-items:center;justify-content:space-between;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:10px 12px">
+        <div>
+          <div style="font-size:12px;font-weight:600;color:var(--text)">${o.service}</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:2px">${new Date(o.created_at).toLocaleDateString('fr-FR')}</div>
+        </div>
+        <div style="text-align:right">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:var(--green)">${parseFloat(o.amount).toFixed(2)}€</div>
+          <span class="status-badge status-${o.status}" style="font-size:9px;padding:2px 6px">${statusLabel(o.status)}</span>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  const modal = document.getElementById('clientModal');
+  modal.style.display = 'flex';
+}
+
+function closeClientModal(){
+  document.getElementById('clientModal').style.display = 'none';
+  currentClientId = null;
+}
+
+async function resetPassword(){
+  const pwd = document.getElementById('new-password').value.trim();
+  const msg = document.getElementById('password-msg');
+  if(!pwd || pwd.length < 6){ msg.textContent='⚠️ Min. 6 caractères'; msg.style.color='#ffaa33'; msg.style.display='block'; return; }
+  try {
+    const res = await fetch(`${API}/api/admin/users/${currentClientId}/password`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({password: pwd})
+    });
+    const data = await res.json();
+    if(data.success){ msg.textContent='✓ Mot de passe modifié !'; msg.style.color='var(--green)'; msg.style.display='block'; document.getElementById('new-password').value=''; }
+    else { msg.textContent='✗ Erreur'; msg.style.color='#ff4d4d'; msg.style.display='block'; }
+  } catch { msg.textContent='✗ Erreur'; msg.style.color='#ff4d4d'; msg.style.display='block'; }
+}
+
+async function deleteClient(){
+  if(!confirm('Supprimer définitivement ce compte client ?')) return;
+  try {
+    const res = await fetch(`${API}/api/admin/users/${currentClientId}`,{
+      method:'DELETE',
+      headers:{'Authorization':'Bearer '+token}
+    });
+    const data = await res.json();
+    if(data.success){
+      closeClientModal();
+      loadClients();
+      showToast('Client supprimé');
+    }
+  } catch { showToast('Erreur suppression'); }
 }
 
 // Auto refresh every 30s
