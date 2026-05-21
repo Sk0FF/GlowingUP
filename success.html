@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Commande confirmée — GlowingUp</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#060808;--card:#0f1210;--line:#1a1f1b;--green:#4dff7c;--green-dim:rgba(77,255,124,.09);--green-border:rgba(77,255,124,.2);--text:#e5ede7;--text2:#8fa893;--text3:#4d5e50;--white:#f0f8f2}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.box{background:var(--card);border:1px solid var(--green-border);border-radius:24px;padding:48px 40px;text-align:center;max-width:480px;width:100%;position:relative;overflow:hidden}
+.box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.icon{width:72px;height:72px;border-radius:50%;background:var(--green-dim);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;font-size:32px}
+.title{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;color:var(--white);margin-bottom:10px}
+.title span{color:var(--green)}
+.sub{color:var(--text2);font-size:15px;line-height:1.7;margin-bottom:32px;font-weight:300}
+.info-box{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:16px 20px;margin-bottom:24px;text-align:left}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--line)}
+.info-row:last-child{border-bottom:none}
+.info-label{font-size:12px;color:var(--text3)}
+.info-val{font-size:13px;font-weight:500;color:var(--text)}
+.btn-home{display:inline-block;background:var(--green);color:#020902;padding:13px 32px;border-radius:10px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;text-decoration:none;transition:all .2s}
+.btn-home:hover{filter:brightness(1.08)}
+.note{font-size:12px;color:var(--text3);margin-top:16px}
+</style>
+</head>
+<body>
+<div class="box">
+  <div class="icon">✓</div>
+  <div class="title">COMMANDE <span>CONFIRMÉE</span></div>
+  <p class="sub">Ton paiement a bien été reçu. Ta commande est en cours de traitement et sera livrée très rapidement.</p>
+  <div class="info-box">
+    <div class="info-row"><span class="info-label">Statut</span><span class="info-val" style="color:var(--green)">✓ Payé</span></div>
+    <div class="info-row"><span class="info-label">Livraison</span><span class="info-val">Dans les prochaines minutes</span></div>
+    <div class="info-row"><span class="info-label">Support</span><span class="info-val">glow.agencyyy@gmail.com</span></div>
+  </div>
+  <a href="index.html" class="btn-home">RETOUR À L'ACCUEIL →</a>
+  <div class="note">Un email de confirmation a été envoyé à ton adresse.</div>
+</div>
+</body>
+</html>

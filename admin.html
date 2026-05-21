@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Admin — GlowingUp</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#060808;--surface:#0a0d0b;--card:#0f1210;--card2:#121512;
+  --line:#1a1f1b;--line2:#202620;
+  --green:#4dff7c;--green-dim:rgba(77,255,124,.09);--green-border:rgba(77,255,124,.2);
+  --text:#e5ede7;--text2:#8fa893;--text3:#4d5e50;--white:#f0f8f2;
+  --red:#ff4d4d;--orange:#ffaa33;
+}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;min-height:100vh}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.login-box{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:40px;width:100%;max-width:380px}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--white);display:flex;align-items:center;gap:8px;margin-bottom:28px}
+.login-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.login-title{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--white);margin-bottom:6px}
+.login-sub{font-size:13px;color:var(--text3);margin-bottom:28px}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:11px;color:var(--text3);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.fi{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--white);padding:11px 14px;border-radius:9px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .18s}
+.fi:focus{border-color:var(--green-border)}
+.fi::placeholder{color:var(--text3)}
+.btn-submit{width:100%;background:var(--green);border:none;color:#020902;padding:13px;border-radius:10px;font-size:14px;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;cursor:pointer;transition:all .2s;margin-top:8px}
+.btn-submit:hover{filter:brightness(1.08)}
+.login-error{color:var(--red);font-size:13px;margin-top:10px;text-align:center;display:none}
+
+/* DASHBOARD */
+.dashboard{display:none}
+.sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:var(--surface);border-right:1px solid var(--line);padding:24px 0;display:flex;flex-direction:column}
+.sidebar-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--white);display:flex;align-items:center;gap:8px;padding:0 20px 24px;border-bottom:1px solid var(--line)}
+.sidebar-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 20px;color:var(--text3);cursor:pointer;transition:all .18s;font-size:13px;font-weight:500;border-left:2px solid transparent}
+.nav-item:hover{color:var(--text);background:rgba(77,255,124,.04)}
+.nav-item.active{color:var(--green);border-left-color:var(--green);background:var(--green-dim)}
+.nav-item svg{width:16px;height:16px;flex-shrink:0}
+.sidebar-bottom{margin-top:auto;padding:16px 20px;border-top:1px solid var(--line)}
+.btn-logout{width:100%;background:none;border:1px solid var(--line);color:var(--text3);padding:9px;border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .18s}
+.btn-logout:hover{border-color:var(--red);color:var(--red)}
+
+.main{margin-left:220px;padding:32px;min-height:100vh}
+.page{display:none}
+.page.active{display:block}
+.page-title{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--white);margin-bottom:6px}
+.page-sub{color:var(--text3);font-size:13px;margin-bottom:32px}
+
+/* STATS CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:32px}
+.stat-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:22px 20px;transition:border-color .2s}
+.stat-card:hover{border-color:var(--line2)}
+.stat-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px}
+.stat-value{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--white);line-height:1}
+.stat-value.green{color:var(--green)}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:5px}
+
+/* TABLE */
+.table-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:12px}
+.table-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--white)}
+.search-input{background:var(--card);border:1px solid var(--line);color:var(--text);padding:9px 14px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;width:220px;transition:border-color .18s}
+.search-input:focus{border-color:var(--green-border)}
+.search-input::placeholder{color:var(--text3)}
+.table-wrap{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+table{width:100%;border-collapse:collapse}
+thead th{background:var(--card2);padding:11px 16px;text-align:left;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--line)}
+tbody tr{border-bottom:1px solid var(--line);transition:background .15s}
+tbody tr:last-child{border-bottom:none}
+tbody tr:hover{background:rgba(77,255,124,.02)}
+td{padding:13px 16px;font-size:13px;vertical-align:middle}
+.td-id{color:var(--text3);font-size:11px}
+.td-service{font-weight:500;color:var(--text)}
+.td-link{color:var(--text3);font-size:11px;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.td-amount{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--green);letter-spacing:1px}
+.td-date{color:var(--text3);font-size:11px}
+.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:4px 10px;border-radius:100px;border:1px solid;letter-spacing:.3px;text-transform:uppercase}
+.status-pending{background:rgba(255,170,51,.1);color:#ffaa33;border-color:rgba(255,170,51,.2)}
+.status-processing{background:rgba(77,150,255,.1);color:#4d96ff;border-color:rgba(77,150,255,.2)}
+.status-delivered{background:var(--green-dim);color:var(--green);border-color:var(--green-border)}
+.status-cancelled{background:rgba(255,77,77,.1);color:var(--red);border-color:rgba(255,77,77,.2)}
+.action-select{background:var(--bg);border:1px solid var(--line);color:var(--text);padding:5px 8px;border-radius:6px;font-size:11px;font-family:'DM Sans',sans-serif;cursor:pointer;outline:none}
+.btn-delete{background:none;border:1px solid var(--line);color:var(--text3);padding:5px 8px;border-radius:6px;font-size:11px;cursor:pointer;transition:all .18s}
+.btn-delete:hover{border-color:var(--red);color:var(--red)}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-icon{font-size:40px;margin-bottom:12px}
+.empty-text{font-size:14px}
+
+/* FILTER TABS */
+.filter-tabs{display:flex;gap:6px;margin-bottom:20px;flex-wrap:wrap}
+.filter-tab{padding:7px 16px;border-radius:100px;border:1px solid var(--line);background:none;color:var(--text3);font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .18s}
+.filter-tab:hover{border-color:var(--line2);color:var(--text)}
+.filter-tab.active{background:var(--green-dim);color:var(--green);border-color:var(--green-border)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;right:24px;background:var(--card);border:1px solid var(--green-border);color:var(--green);padding:12px 20px;border-radius:10px;font-size:13px;font-weight:500;z-index:999;transform:translateY(100px);opacity:0;transition:all .3s}
+.toast.show{transform:translateY(0);opacity:1}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo"><div class="login-dot"></div>GLOWINGUP</div>
+    <div class="login-title">ADMIN</div>
+    <div class="login-sub">Connecte-toi pour gérer tes commandes</div>
+    <div class="fg"><label class="fl">Email</label><input type="email" class="fi" id="loginEmail" placeholder="glow.agencyyy@gmail.com"></div>
+    <div class="fg"><label class="fl">Mot de passe</label><input type="password" class="fi" id="loginPass" placeholder="••••••••" onkeydown="if(event.key==='Enter')login()"></div>
+    <button class="btn-submit" onclick="login()">SE CONNECTER →</button>
+    <div class="login-error" id="loginError">Email ou mot de passe incorrect</div>
+  </div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="dashboard" id="dashboard">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-logo"><div class="sidebar-dot"></div>GLOWINGUP</div>
+    <div class="nav-item active" onclick="showPage('orders')" id="nav-orders">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+      Commandes
+    </div>
+    <div class="nav-item" onclick="showPage('stats')" id="nav-stats">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Statistiques
+    </div>
+    <div class="sidebar-bottom">
+      <button class="btn-logout" onclick="logout()">Se déconnecter</button>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- ORDERS PAGE -->
+    <div class="page active" id="page-orders">
+      <div class="page-title">COMMANDES</div>
+      <div class="page-sub">Gérez et suivez toutes les commandes en temps réel</div>
+
+      <div class="filter-tabs">
+        <button class="filter-tab active" onclick="filterOrders('all',this)">Toutes</button>
+        <button class="filter-tab" onclick="filterOrders('pending',this)">En attente</button>
+        <button class="filter-tab" onclick="filterOrders('processing',this)">En cours</button>
+        <button class="filter-tab" onclick="filterOrders('delivered',this)">Livrées</button>
+        <button class="filter-tab" onclick="filterOrders('cancelled',this)">Annulées</button>
+      </div>
+
+      <div class="table-header">
+        <div class="table-title">Liste des commandes</div>
+        <input type="text" class="search-input" placeholder="🔍 Rechercher..." oninput="searchOrders(this.value)">
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Service</th>
+              <th>Lien</th>
+              <th>Qté</th>
+              <th>Montant</th>
+              <th>Email</th>
+              <th>Date</th>
+              <th>Statut</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="ordersTable">
+            <tr><td colspan="9"><div class="empty"><div class="empty-icon">📦</div><div class="empty-text">Chargement...</div></div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- STATS PAGE -->
+    <div class="page" id="page-stats">
+      <div class="page-title">STATISTIQUES</div>
+      <div class="page-sub">Vue d'ensemble de ton activité</div>
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total commandes</div>
+          <div class="stat-value" id="stat-total">—</div>
+          <div class="stat-sub">Depuis le début</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Chiffre d'affaires</div>
+          <div class="stat-value green" id="stat-revenue">—</div>
+          <div class="stat-sub">Total encaissé</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">En attente</div>
+          <div class="stat-value" id="stat-pending">—</div>
+          <div class="stat-sub">À traiter</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Livrées</div>
+          <div class="stat-value" id="stat-delivered">—</div>
+          <div class="stat-sub">Complétées</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'https://glowingup-backend-production.up.railway.app';
+let token = localStorage.getItem('admin_token');
+let allOrders = [];
+let currentFilter = 'all';
+
+// Check if already logged in
+if(token) showDashboard();
+
+async function login(){
+  const email = document.getElementById('loginEmail').value;
+  const pass = document.getElementById('loginPass').value;
+  try {
+    const res = await fetch(`${API}/api/admin/login`, {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({email,password:pass})
+    });
+    const data = await res.json();
+    if(data.token){
+      localStorage.setItem('admin_token',data.token);
+      token = data.token;
+      showDashboard();
+    } else {
+      document.getElementById('loginError').style.display='block';
+    }
+  } catch {
+    document.getElementById('loginError').style.display='block';
+  }
+}
+
+function showDashboard(){
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('dashboard').style.display='block';
+  loadOrders();
+  loadStats();
+}
+
+function logout(){
+  localStorage.removeItem('admin_token');
+  location.reload();
+}
+
+function showPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.getElementById('nav-'+page).classList.add('active');
+}
+
+async function loadOrders(){
+  try {
+    const res = await fetch(`${API}/api/admin/orders`,{headers:{'Authorization':'Bearer '+token}});
+    allOrders = await res.json();
+    renderOrders(allOrders);
+  } catch {
+    showToast('Erreur de chargement');
+  }
+}
+
+async function loadStats(){
+  try {
+    const res = await fetch(`${API}/api/admin/stats`,{headers:{'Authorization':'Bearer '+token}});
+    const s = await res.json();
+    document.getElementById('stat-total').textContent = s.total;
+    document.getElementById('stat-revenue').textContent = s.revenue.toFixed(2)+'€';
+    document.getElementById('stat-pending').textContent = s.pending;
+    document.getElementById('stat-delivered').textContent = s.delivered;
+  } catch {}
+}
+
+function renderOrders(orders){
+  const tbody = document.getElementById('ordersTable');
+  if(!orders.length){
+    tbody.innerHTML='<tr><td colspan="9"><div class="empty"><div class="empty-icon">📦</div><div class="empty-text">Aucune commande pour le moment</div></div></td></tr>';
+    return;
+  }
+  tbody.innerHTML = orders.map(o=>`
+    <tr id="row-${o.id}">
+      <td class="td-id">#${o.id}</td>
+      <td><div class="td-service">${o.service}</div><div style="font-size:10px;color:var(--text3)">${o.platform}</div></td>
+      <td class="td-link" title="${o.link}">${o.link}</td>
+      <td>${o.quantity?.toLocaleString()}</td>
+      <td class="td-amount">${parseFloat(o.amount).toFixed(2)}€</td>
+      <td class="td-link">${o.email||'—'}</td>
+      <td class="td-date">${new Date(o.created_at).toLocaleDateString('fr-FR')}</td>
+      <td><span class="status-badge status-${o.status}">${statusLabel(o.status)}</span></td>
+      <td style="display:flex;gap:6px;align-items:center">
+        <select class="action-select" onchange="updateStatus(${o.id},this.value)">
+          <option value="pending" ${o.status==='pending'?'selected':''}>En attente</option>
+          <option value="processing" ${o.status==='processing'?'selected':''}>En cours</option>
+          <option value="delivered" ${o.status==='delivered'?'selected':''}>Livré</option>
+          <option value="cancelled" ${o.status==='cancelled'?'selected':''}>Annulé</option>
+        </select>
+        <button class="btn-delete" onclick="deleteOrder(${o.id})">🗑</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function statusLabel(s){
+  return {pending:'En attente',processing:'En cours',delivered:'Livré',cancelled:'Annulé'}[s]||s;
+}
+
+async function updateStatus(id, status){
+  try {
+    await fetch(`${API}/api/admin/orders/${id}`,{
+      method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body:JSON.stringify({status})
+    });
+    const o = allOrders.find(o=>o.id===id);
+    if(o) o.status = status;
+    showToast('Statut mis à jour ✓');
+    loadStats();
+    renderOrders(getFilteredOrders());
+  } catch { showToast('Erreur'); }
+}
+
+async function deleteOrder(id){
+  if(!confirm('Supprimer cette commande ?')) return;
+  try {
+    await fetch(`${API}/api/admin/orders/${id}`,{
+      method:'DELETE',
+      headers:{'Authorization':'Bearer '+token}
+    });
+    allOrders = allOrders.filter(o=>o.id!==id);
+    showToast('Commande supprimée');
+    loadStats();
+    renderOrders(getFilteredOrders());
+  } catch { showToast('Erreur'); }
+}
+
+function filterOrders(filter, btn){
+  currentFilter = filter;
+  document.querySelectorAll('.filter-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  renderOrders(getFilteredOrders());
+}
+
+function getFilteredOrders(){
+  if(currentFilter==='all') return allOrders;
+  return allOrders.filter(o=>o.status===currentFilter);
+}
+
+function searchOrders(q){
+  const filtered = getFilteredOrders().filter(o=>
+    o.service?.toLowerCase().includes(q.toLowerCase()) ||
+    o.email?.toLowerCase().includes(q.toLowerCase()) ||
+    o.link?.toLowerCase().includes(q.toLowerCase())
+  );
+  renderOrders(filtered);
+}
+
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// Auto refresh every 30s
+setInterval(()=>{ if(token){ loadOrders(); loadStats(); } }, 30000);
+</script>
+</body>
+</html>
