@@ -796,6 +796,62 @@ async function submitOrder(){
 
 function closeM(){document.getElementById('ov').classList.remove('on')}
 function closeOut(e){if(e.target===document.getElementById('ov'))closeM()}
+
+/* ── SCROLL REVEAL ── */
+const revealCSS = `
+@keyframes shimmer{0%{background-position:-200% center}100%{background-position:200% center}}
+.reveal{opacity:0;transform:translateY(35px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-left{opacity:0;transform:translateX(-40px);transition:opacity .8s cubic-bezier(.16,1,.3,1),transform .8s cubic-bezier(.16,1,.3,1)}
+.reveal-left.visible{opacity:1;transform:translateX(0)}
+.reveal-scale{opacity:0;transform:scale(.93);transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1)}
+.reveal-scale.visible{opacity:1;transform:scale(1)}
+`;
+const styleEl = document.createElement('style');
+styleEl.textContent = revealCSS;
+document.head.appendChild(styleEl);
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    // Page header
+    document.querySelectorAll('.page-header .eyebrow, .page-header h1, .page-header p').forEach((el,i) => {
+      el.classList.add('reveal');
+      el.style.transitionDelay = (i * 0.12) + 's';
+    });
+
+    // Search
+    const search = document.querySelector('.search-wrap');
+    if(search){ search.classList.add('reveal'); search.style.transitionDelay = '.3s'; }
+
+    // Platform sections — stagger rows
+    document.querySelectorAll('.platform-section').forEach((section, si) => {
+      section.classList.add('reveal');
+      section.style.transitionDelay = (si * 0.08) + 's';
+    });
+
+    // Sidebar filters
+    document.querySelectorAll('.filter-btn').forEach((el,i) => {
+      el.classList.add('reveal-left');
+      el.style.transitionDelay = (i * 0.04) + 's';
+    });
+
+    // Shimmer on green prices
+    document.querySelectorAll('.svc-price').forEach(el => {
+      el.style.background = 'linear-gradient(90deg, #4dff7c, #00ffaa, #4dff7c)';
+      el.style.backgroundSize = '200% auto';
+      el.style.webkitBackgroundClip = 'text';
+      el.style.webkitTextFillColor = 'transparent';
+      el.style.animation = 'shimmer 3s linear infinite';
+    });
+
+    // Observer
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.reveal, .reveal-left, .reveal-scale').forEach(el => obs.observe(el));
+  }, 150);
+});
 </script>
 </body>
 </html>
