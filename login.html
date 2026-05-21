@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Connexion — GlowingUp</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#060808;--surface:#0a0d0b;--card:#0f1210;--card2:#121512;--line:#1a1f1b;--line2:#202620;--green:#4dff7c;--green-dim:rgba(77,255,124,.09);--green-border:rgba(77,255,124,.2);--text:#e5ede7;--text2:#8fa893;--text3:#4d5e50;--white:#f0f8f2;--red:#ff4d4d}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;min-height:100vh;display:flex;flex-direction:column}
+#bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.4}
+nav{position:fixed;inset:0 0 auto;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:60px;border-bottom:1px solid var(--line);background:rgba(6,8,8,.88);backdrop-filter:blur(16px)}
+.n-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--white);display:flex;align-items:center;gap:8px;text-decoration:none}
+.n-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.wrap{flex:1;display:flex;align-items:center;justify-content:center;padding:80px 24px 40px;position:relative;z-index:1}
+.box{background:var(--card);border:1px solid var(--line);border-radius:22px;padding:44px;width:100%;max-width:420px;position:relative;overflow:hidden}
+.box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.box-logo{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--text2);display:flex;align-items:center;gap:7px;margin-bottom:24px}
+.box-logo-dot{width:6px;height:6px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+.tabs{display:flex;gap:4px;background:var(--bg);border-radius:10px;padding:4px;margin-bottom:28px}
+.tab{flex:1;padding:10px;border-radius:8px;border:none;background:none;color:var(--text3);cursor:pointer;font-size:13px;font-weight:600;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;transition:all .2s}
+.tab.active{background:var(--card2);color:var(--white);border:1px solid var(--line)}
+.form{display:none}
+.form.active{display:block}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:10px;color:var(--text3);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.fi{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--white);padding:12px 14px;border-radius:9px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s}
+.fi:focus{border-color:var(--green-border)}
+.fi::placeholder{color:var(--text3)}
+.btn-submit{width:100%;background:var(--green);border:none;color:#020902;padding:13px;border-radius:10px;font-size:14px;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;cursor:pointer;margin-top:8px;transition:all .2s}
+.btn-submit:hover{filter:brightness(1.08);box-shadow:0 4px 20px rgba(77,255,124,.25)}
+.error-msg{color:var(--red);font-size:13px;margin-top:10px;text-align:center;display:none;padding:10px;background:rgba(255,77,77,.08);border:1px solid rgba(255,77,77,.2);border-radius:8px}
+.note{font-size:12px;color:var(--text3);text-align:center;margin-top:14px}
+.note a{color:var(--green);text-decoration:none}
+</style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+<nav>
+  <a class="n-logo" href="index.html"><div class="n-dot"></div>GLOWINGUP</a>
+</nav>
+<div class="wrap">
+  <div class="box">
+    <div class="box-logo"><div class="box-logo-dot"></div>GLOWINGUP</div>
+    <div class="tabs">
+      <button class="tab active" id="tab-login" onclick="switchTab('login')">CONNEXION</button>
+      <button class="tab" id="tab-register" onclick="switchTab('register')">INSCRIPTION</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="form active" id="form-login">
+      <div class="fg"><label class="fl">Email</label><input type="email" class="fi" id="login-email" placeholder="toi@exemple.com"></div>
+      <div class="fg"><label class="fl">Mot de passe</label><input type="password" class="fi" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn-submit" onclick="doLogin()">SE CONNECTER →</button>
+      <div class="error-msg" id="login-error"></div>
+      <div class="note">Pas encore de compte ? <a href="#" onclick="switchTab('register')">Inscris-toi</a></div>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="form" id="form-register">
+      <div class="fg"><label class="fl">Prénom</label><input type="text" class="fi" id="reg-name" placeholder="Ton prénom"></div>
+      <div class="fg"><label class="fl">Email</label><input type="email" class="fi" id="reg-email" placeholder="toi@exemple.com"></div>
+      <div class="fg"><label class="fl">Mot de passe</label><input type="password" class="fi" id="reg-pass" placeholder="Min. 8 caractères"></div>
+      <button class="btn-submit" onclick="doRegister()">CRÉER MON COMPTE →</button>
+      <div class="error-msg" id="reg-error"></div>
+      <div class="note">Déjà un compte ? <a href="#" onclick="switchTab('login')">Connecte-toi</a></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'https://glowingup-backend-production.up.railway.app';
+
+// Redirect if already logged in
+if(localStorage.getItem('user_token')) window.location.href = 'compte.html';
+
+function switchTab(t){
+  document.getElementById('form-login').classList.toggle('active', t==='login');
+  document.getElementById('form-register').classList.toggle('active', t==='register');
+  document.getElementById('tab-login').classList.toggle('active', t==='login');
+  document.getElementById('tab-register').classList.toggle('active', t==='register');
+}
+
+async function doLogin(){
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const err = document.getElementById('login-error');
+  err.style.display='none';
+  try {
+    const res = await fetch(`${API}/api/auth/login`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
+    const data = await res.json();
+    if(data.token){
+      localStorage.setItem('user_token', data.token);
+      localStorage.setItem('user_data', JSON.stringify(data.user));
+      window.location.href = 'compte.html';
+    } else {
+      err.textContent = data.error || 'Erreur de connexion';
+      err.style.display='block';
+    }
+  } catch {
+    err.textContent = 'Erreur de connexion. Réessaie.';
+    err.style.display='block';
+  }
+}
+
+async function doRegister(){
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-pass').value;
+  const err = document.getElementById('reg-error');
+  err.style.display='none';
+  if(!name||!email||!pass){err.textContent='Remplis tous les champs';err.style.display='block';return}
+  if(pass.length<8){err.textContent='Mot de passe trop court (min. 8 caractères)';err.style.display='block';return}
+  try {
+    const res = await fetch(`${API}/api/auth/register`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password:pass})});
+    const data = await res.json();
+    if(data.token){
+      localStorage.setItem('user_token', data.token);
+      localStorage.setItem('user_data', JSON.stringify(data.user));
+      window.location.href = 'compte.html';
+    } else {
+      err.textContent = data.error || 'Erreur';
+      err.style.display='block';
+    }
+  } catch {
+    err.textContent = 'Erreur. Réessaie.';
+    err.style.display='block';
+  }
+}
+
+// Particles bg
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let W,H,particles=[];
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
+resize();window.addEventListener('resize',resize);
+class P{constructor(){this.reset()}reset(){this.x=Math.random()*W;this.y=Math.random()*H;this.size=Math.random()*1.2+.3;this.sx=(Math.random()-.5)*.3;this.sy=(Math.random()-.5)*.3;this.o=Math.random()*.5+.1;this.p=Math.random()*Math.PI*2}update(){this.x+=this.sx;this.y+=this.sy;this.p+=.02;this.o=.2+Math.sin(this.p)*.2;if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset()}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.size,0,Math.PI*2);ctx.fillStyle=`rgba(77,255,124,${this.o})`;ctx.fill()}}
+for(let i=0;i<80;i++)particles.push(new P());
+function animate(){ctx.clearRect(0,0,W,H);particles.forEach(p=>{p.update();p.draw()});requestAnimationFrame(animate)}
+animate();
+</script>
+</body>
+</html>

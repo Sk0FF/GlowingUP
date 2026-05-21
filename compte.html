@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mon compte — GlowingUp</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#060808;--surface:#0a0d0b;--card:#0f1210;--card2:#121512;--line:#1a1f1b;--line2:#202620;--green:#4dff7c;--green-dim:rgba(77,255,124,.09);--green-border:rgba(77,255,124,.2);--text:#e5ede7;--text2:#8fa893;--text3:#4d5e50;--white:#f0f8f2;--red:#ff4d4d;--orange:#ffaa33}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;min-height:100vh}
+
+nav{position:fixed;inset:0 0 auto;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:60px;border-bottom:1px solid var(--line);background:rgba(6,8,8,.88);backdrop-filter:blur(16px)}
+.n-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--white);display:flex;align-items:center;gap:8px;text-decoration:none}
+.n-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.n-links{display:flex;gap:28px;list-style:none}
+.n-links a{color:var(--text3);text-decoration:none;font-size:13px;font-weight:500;transition:color .2s}
+.n-links a:hover{color:var(--text)}
+.n-right{display:flex;gap:10px;align-items:center}
+.nav-user{font-size:13px;color:var(--text2);font-weight:500}
+.btn-logout{border:1px solid var(--line2);background:none;color:var(--text3);padding:7px 16px;border-radius:7px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
+.btn-logout:hover{border-color:var(--red);color:var(--red)}
+
+.main{max-width:1000px;margin:0 auto;padding:88px 24px 60px}
+
+/* PROFILE CARD */
+.profile-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:32px;margin-bottom:24px;display:flex;align-items:center;gap:24px;position:relative;overflow:hidden}
+.profile-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.profile-avatar{width:64px;height:64px;border-radius:50%;background:var(--green-dim);border:2px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--green);flex-shrink:0;letter-spacing:1px}
+.profile-info{flex:1}
+.profile-name{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--white);margin-bottom:3px}
+.profile-email{font-size:13px;color:var(--text3)}
+.profile-since{font-size:12px;color:var(--text3);margin-top:4px}
+.profile-stats{display:flex;gap:24px;flex-wrap:wrap}
+.p-stat{text-align:center;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 20px}
+.p-stat-num{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;color:var(--green);line-height:1}
+.p-stat-lbl{font-size:11px;color:var(--text3);letter-spacing:.5px;margin-top:3px;text-transform:uppercase}
+
+/* ORDERS */
+.section-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--white);margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.section-title span{font-size:13px;color:var(--text3);font-family:'DM Sans',sans-serif;font-weight:400;letter-spacing:0}
+
+.orders-list{display:flex;flex-direction:column;gap:12px}
+.order-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 24px;display:flex;align-items:center;gap:16px;transition:border-color .2s;flex-wrap:wrap}
+.order-card:hover{border-color:var(--line2)}
+.order-icon{width:44px;height:44px;border-radius:12px;background:var(--green-dim);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.order-info{flex:1;min-width:200px}
+.order-service{font-size:14px;font-weight:600;color:var(--text);margin-bottom:3px}
+.order-meta{font-size:12px;color:var(--text3);display:flex;gap:12px;flex-wrap:wrap}
+.order-link{font-size:11px;color:var(--text3);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:260px}
+.order-right{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.order-amount{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--green);letter-spacing:1px}
+.status-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:600;padding:4px 10px;border-radius:100px;border:1px solid;letter-spacing:.3px;text-transform:uppercase;white-space:nowrap}
+.status-pending{background:rgba(255,170,51,.1);color:#ffaa33;border-color:rgba(255,170,51,.2)}
+.status-processing{background:rgba(77,150,255,.1);color:#4d96ff;border-color:rgba(77,150,255,.2)}
+.status-delivered{background:var(--green-dim);color:var(--green);border-color:var(--green-border)}
+.status-cancelled{background:rgba(255,77,77,.1);color:var(--red);border-color:rgba(255,77,77,.2)}
+.order-date{font-size:11px;color:var(--text3)}
+
+.empty-state{text-align:center;padding:60px 20px;color:var(--text3)}
+.empty-icon{font-size:48px;margin-bottom:16px}
+.empty-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--text2);margin-bottom:8px}
+.empty-sub{font-size:14px;margin-bottom:24px}
+.btn-shop{display:inline-block;background:var(--green);color:#020902;padding:12px 28px;border-radius:9px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;text-decoration:none;transition:all .2s}
+.btn-shop:hover{filter:brightness(1.08)}
+
+.platform-icon{font-size:16px}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="n-logo" href="index.html"><div class="n-dot"></div>GLOWINGUP</a>
+  <ul class="n-links">
+    <li><a href="services.html">Services</a></li>
+    <li><a href="index.html#faq">FAQ</a></li>
+  </ul>
+  <div class="n-right">
+    <span class="nav-user" id="nav-username">—</span>
+    <button class="btn-logout" onclick="logout()">Se déconnecter</button>
+  </div>
+</nav>
+
+<div class="main">
+
+  <!-- PROFILE -->
+  <div class="profile-card">
+    <div class="profile-avatar" id="profile-avatar">?</div>
+    <div class="profile-info">
+      <div class="profile-name" id="profile-name">Chargement...</div>
+      <div class="profile-email" id="profile-email">—</div>
+      <div class="profile-since" id="profile-since">—</div>
+    </div>
+    <div class="profile-stats">
+      <div class="p-stat">
+        <div class="p-stat-num" id="ps-total">0</div>
+        <div class="p-stat-lbl">Commandes</div>
+      </div>
+      <div class="p-stat">
+        <div class="p-stat-num" id="ps-spent">0€</div>
+        <div class="p-stat-lbl">Dépensé</div>
+      </div>
+      <div class="p-stat">
+        <div class="p-stat-num" id="ps-delivered">0</div>
+        <div class="p-stat-lbl">Livrées</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ORDERS -->
+  <div class="section-title">
+    HISTORIQUE DES ACHATS
+    <span id="orders-count"></span>
+  </div>
+  <div class="orders-list" id="ordersList">
+    <div class="empty-state"><div class="empty-icon">⏳</div><div class="empty-title">Chargement...</div></div>
+  </div>
+
+</div>
+
+<script>
+const API = 'https://glowingup-backend-production.up.railway.app';
+const token = localStorage.getItem('user_token');
+const userData = JSON.parse(localStorage.getItem('user_data') || 'null');
+
+if (!token) window.location.href = 'login.html';
+
+function logout(){
+  localStorage.removeItem('user_token');
+  localStorage.removeItem('user_data');
+  window.location.href = 'index.html';
+}
+
+function platformIcon(p){
+  const icons = {Instagram:'📸',TikTok:'🎵',YouTube:'▶️','Twitter / X':'𝕏',Facebook:'👥',Telegram:'✈️'};
+  return icons[p] || '🌐';
+}
+
+function statusLabel(s){
+  return {pending:'En attente',processing:'En cours',delivered:'Livré ✓',cancelled:'Annulé'}[s]||s;
+}
+
+async function loadData(){
+  // Profile
+  if(userData){
+    const initials = userData.name?.split(' ').map(w=>w[0]).join('').toUpperCase().substring(0,2)||'?';
+    document.getElementById('profile-avatar').textContent = initials;
+    document.getElementById('profile-name').textContent = userData.name;
+    document.getElementById('profile-email').textContent = userData.email;
+    document.getElementById('nav-username').textContent = userData.name;
+  }
+
+  // Orders
+  try {
+    const res = await fetch(`${API}/api/user/orders`, {headers:{'Authorization':'Bearer '+token}});
+    if(res.status === 401){ logout(); return; }
+    const orders = await res.json();
+
+    // Profile since
+    try {
+      const meRes = await fetch(`${API}/api/user/me`, {headers:{'Authorization':'Bearer '+token}});
+      const me = await meRes.json();
+      document.getElementById('profile-since').textContent = 'Membre depuis ' + new Date(me.created_at).toLocaleDateString('fr-FR', {month:'long',year:'numeric'});
+    } catch{}
+
+    // Stats
+    const total = orders.length;
+    const spent = orders.reduce((s,o)=>s+parseFloat(o.amount||0),0);
+    const delivered = orders.filter(o=>o.status==='delivered').length;
+    document.getElementById('ps-total').textContent = total;
+    document.getElementById('ps-spent').textContent = spent.toFixed(2)+'€';
+    document.getElementById('ps-delivered').textContent = delivered;
+    document.getElementById('orders-count').textContent = total ? `${total} commande${total>1?'s':''}` : '';
+
+    if(!orders.length){
+      document.getElementById('ordersList').innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">🛒</div>
+          <div class="empty-title">Aucune commande</div>
+          <div class="empty-sub">Tu n'as pas encore passé de commande.</div>
+          <a href="services.html" class="btn-shop">VOIR LES SERVICES →</a>
+        </div>`;
+      return;
+    }
+
+    document.getElementById('ordersList').innerHTML = orders.map(o => `
+      <div class="order-card">
+        <div class="order-icon">${platformIcon(o.platform)}</div>
+        <div class="order-info">
+          <div class="order-service">${o.service}</div>
+          <div class="order-meta">
+            <span>${o.platform}</span>
+            <span>•</span>
+            <span>${parseInt(o.quantity)?.toLocaleString()} unités</span>
+          </div>
+          <div class="order-link">${o.link}</div>
+        </div>
+        <div class="order-right">
+          <div class="order-amount">${parseFloat(o.amount).toFixed(2)}€</div>
+          <span class="status-badge status-${o.status}">${statusLabel(o.status)}</span>
+          <div class="order-date">${new Date(o.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'})}</div>
+        </div>
+      </div>
+    `).join('');
+
+  } catch(err) {
+    document.getElementById('ordersList').innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><div class="empty-title">Erreur de chargement</div></div>';
+  }
+}
+
+loadData();
+</script>
+</body>
+</html>
