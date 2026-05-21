@@ -321,52 +321,52 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle}
   </div>
 </div>
 
-<!-- PROMO PAGE -->
-<div class="page" id="page-promos" style="display:none;margin-left:220px;padding:32px;min-height:100vh">
-  <div class="page-title">CODES PROMO</div>
-  <div class="page-sub">Gérez vos codes de réduction</div>
+    <!-- PROMO PAGE -->
+    <div class="page" id="page-promos">
+      <div class="page-title">CODES PROMO</div>
+      <div class="page-sub">Gérez vos codes de réduction</div>
 
-  <!-- CREATE FORM -->
-  <div style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:24px">
-    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--white);margin-bottom:20px">CRÉER UN CODE</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;flex-wrap:wrap">
-      <div>
-        <div class="stat-label" style="margin-bottom:6px">Code</div>
-        <input type="text" id="new-code" class="search-input" placeholder="Ex: SUMMER30" style="width:100%;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+      <!-- CREATE FORM -->
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:24px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--white);margin-bottom:20px">CRÉER UN CODE</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end">
+          <div>
+            <div class="stat-label" style="margin-bottom:6px">Code</div>
+            <input type="text" id="new-code" class="search-input" placeholder="Ex: SUMMER30" style="width:100%;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+          </div>
+          <div>
+            <div class="stat-label" style="margin-bottom:6px">Réduction (%)</div>
+            <input type="number" id="new-discount" class="search-input" placeholder="Ex: 20" min="1" max="100" style="width:100%">
+          </div>
+          <div>
+            <div class="stat-label" style="margin-bottom:6px">Utilisations max</div>
+            <input type="number" id="new-maxuses" class="search-input" placeholder="Ex: 100" min="1" style="width:100%">
+          </div>
+          <button onclick="createPromo()" style="background:var(--green);border:none;color:#020902;padding:10px 20px;border-radius:9px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;white-space:nowrap;height:40px">CRÉER →</button>
+        </div>
+        <div id="promo-create-msg" style="font-size:12px;margin-top:10px;display:none"></div>
       </div>
-      <div>
-        <div class="stat-label" style="margin-bottom:6px">Réduction (%)</div>
-        <input type="number" id="new-discount" class="search-input" placeholder="Ex: 20" min="1" max="100" style="width:100%">
+
+      <!-- PROMO LIST -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Réduction</th>
+              <th>Utilisations</th>
+              <th>Max</th>
+              <th>Statut</th>
+              <th>Créé le</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="promosTable">
+            <tr><td colspan="7"><div class="empty"><div class="empty-icon">🏷️</div><div class="empty-text">Chargement...</div></div></td></tr>
+          </tbody>
+        </table>
       </div>
-      <div>
-        <div class="stat-label" style="margin-bottom:6px">Utilisations max</div>
-        <input type="number" id="new-maxuses" class="search-input" placeholder="Ex: 100" min="1" style="width:100%">
-      </div>
-      <button onclick="createPromo()" style="background:var(--green);border:none;color:#020902;padding:10px 20px;border-radius:9px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;white-space:nowrap;transition:all .2s" onmouseover="this.style.filter='brightness(1.08)'" onmouseout="this.style.filter=''">CRÉER →</button>
     </div>
-    <div id="promo-create-msg" style="font-size:12px;margin-top:10px;display:none"></div>
-  </div>
-
-  <!-- PROMO LIST -->
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>Code</th>
-          <th>Réduction</th>
-          <th>Utilisations</th>
-          <th>Max</th>
-          <th>Statut</th>
-          <th>Créé le</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody id="promosTable">
-        <tr><td colspan="7"><div class="empty"><div class="empty-icon">🏷️</div><div class="empty-text">Chargement...</div></div></td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
 
 <div class="toast" id="toast"></div>
 
@@ -483,11 +483,12 @@ function renderAnalyse(){
 }
 
 function showPage(page){
-  document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='none'});
+  document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active')});
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const pageEl = document.getElementById('page-'+page);
-  if(pageEl){ pageEl.classList.add('active'); pageEl.style.display='block'; }
-  document.getElementById('nav-'+page).classList.add('active');
+  if(pageEl) pageEl.classList.add('active');
+  const navEl = document.getElementById('nav-'+page);
+  if(navEl) navEl.classList.add('active');
   if(page==='analyse') setTimeout(renderAnalyse, 100);
   if(page==='promos') loadPromos();
 }
