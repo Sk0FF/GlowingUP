@@ -670,19 +670,23 @@ nav{position:fixed;inset:0 0 auto;z-index:200;display:flex;align-items:center;ju
       <div class="m-info-box"><div class="m-info-label">Prix / 1000</div><div class="m-info-val" id="m-price">—</div></div>
       <div class="m-info-box"><div class="m-info-label">Min — Max</div><div class="m-info-val" id="m-minmax" style="font-size:12px;color:var(--text2)">—</div></div>
     </div>
+    <div class="fg"><label class="fl">Ton email</label><input type="email" class="fi" id="m-email" placeholder="toi@exemple.com"></div>
     <div class="fg"><label class="fl">Lien du profil / publication</label><input type="text" class="fi" id="m-link" placeholder="https://instagram.com/ton_profil"></div>
     <div class="fg"><label class="fl">Quantité</label><input type="number" class="fi" id="m-qty" placeholder="Ex: 1000" oninput="calcTotal()"></div>
     <div class="m-total">
-      <span class="m-total-label">Total estimé</span>
+      <span class="m-total-label">Total</span>
       <span class="m-total-price" id="m-total">—</span>
     </div>
-    <button class="m-submit">Commander →</button>
-    <div class="m-note">🔒 Paiement sécurisé · Livraison garantie · Support 24/7</div>
+    <button class="m-submit" id="m-submit-btn" onclick="submitOrder()">PAYER MAINTENANT →</button>
+    <div class="m-note">🔒 Paiement sécurisé via Stripe · Livraison garantie · Support 24/7</div>
   </div>
 </div>
 
 <script>
+const API = 'https://glowingup-backend-production.up.railway.app';
 let currentPrice = 0;
+let currentService = '';
+let currentPlatform = '';
 
 function toggleDetail(id){
   const row = document.getElementById(id);
@@ -715,14 +719,19 @@ function filterSearch(){
 }
 
 function openOrder(name, plat, price, min, max){
+  currentService = name;
+  currentPlatform = plat;
+  currentPrice = parseFloat(price.replace(',','.'));
   document.getElementById('m-svc-name').textContent = name;
   document.getElementById('m-svc-plat').textContent = plat;
   document.getElementById('m-price').textContent = price + ' €';
   document.getElementById('m-minmax').textContent = min + ' — ' + max;
+  document.getElementById('m-email').value = '';
   document.getElementById('m-link').value = '';
   document.getElementById('m-qty').value = '';
   document.getElementById('m-total').textContent = '—';
-  currentPrice = parseFloat(price.replace(',','.'));
+  document.getElementById('m-submit-btn').textContent = 'PAYER MAINTENANT →';
+  document.getElementById('m-submit-btn').disabled = false;
   document.getElementById('ov').classList.add('on');
 }
 
@@ -730,6 +739,59 @@ function calcTotal(){
   const qty = parseInt(document.getElementById('m-qty').value) || 0;
   const total = (qty / 1000 * currentPrice).toFixed(2);
   document.getElementById('m-total').textContent = qty > 0 ? total + ' €' : '—';
+}
+
+async function submitOrder(){
+  const email = document.getElementById('m-email').value.trim();
+  const link = document.getElementById('m-link').value.trim();
+  const qty = parseInt(document.getElementById('m-qty').value) || 0;
+  const amount = parseFloat((qty / 1000 * currentPrice).toFixed(2));
+
+  if(!email || !email.includes('@')){
+    alert('Merci d\'entrer un email valide');
+    return;
+  }
+  if(!link){
+    alert('Merci d\'entrer le lien de ton profil ou publication');
+    return;
+  }
+  if(qty < 1){
+    alert('Merci d\'entrer une quantité');
+    return;
+  }
+  if(amount < 0.5){
+    alert('Le montant minimum est de 0,50€');
+    return;
+  }
+
+  const btn = document.getElementById('m-submit-btn');
+  btn.textContent = 'Redirection...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API}/api/create-checkout`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        service: currentService,
+        platform: currentPlatform,
+        link, quantity: qty,
+        amount, email
+      })
+    });
+    const data = await res.json();
+    if(data.url){
+      window.location.href = data.url;
+    } else {
+      alert('Erreur : ' + (data.error || 'Réessaie'));
+      btn.textContent = 'PAYER MAINTENANT →';
+      btn.disabled = false;
+    }
+  } catch(err) {
+    alert('Erreur de connexion. Réessaie.');
+    btn.textContent = 'PAYER MAINTENANT →';
+    btn.disabled = false;
+  }
 }
 
 function closeM(){document.getElementById('ov').classList.remove('on')}
