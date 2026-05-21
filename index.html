@@ -603,6 +603,92 @@ function sw(t){
 }
 function tfaq(el){el.parentElement.classList.toggle('open')}
 
+/* ── FAKE PURCHASE NOTIFICATIONS ── */
+const notifStyle = document.createElement('style');
+notifStyle.textContent = `
+.purchase-notif{
+  position:fixed;bottom:24px;left:24px;z-index:9999;
+  background:#0f1210;border:1px solid #1a1f1b;
+  border-radius:14px;padding:12px 16px;
+  display:flex;align-items:center;gap:12px;
+  max-width:280px;min-width:240px;
+  box-shadow:0 8px 32px rgba(0,0,0,.5);
+  transform:translateX(-120%);opacity:0;
+  transition:transform .5s cubic-bezier(.16,1,.3,1),opacity .5s ease;
+  pointer-events:none;
+}
+.purchase-notif.show{transform:translateX(0);opacity:1}
+.purchase-notif.hide{transform:translateX(-120%);opacity:0}
+.notif-icon{width:38px;height:38px;border-radius:10px;background:rgba(77,255,124,.1);border:1px solid rgba(77,255,124,.2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.notif-content{flex:1;min-width:0}
+.notif-name{font-size:12px;font-weight:600;color:#e5ede7;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.notif-service{font-size:11px;color:#8fa893;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px}
+.notif-footer{display:flex;align-items:center;justify-content:space-between}
+.notif-time{font-size:10px;color:#4d5e50}
+.notif-price{font-size:12px;font-weight:700;color:#4dff7c;font-family:'Bebas Neue',sans-serif;letter-spacing:1px}
+.notif-dot{width:5px;height:5px;border-radius:50%;background:#4dff7c;box-shadow:0 0 6px #4dff7c;animation:pulse 2s infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+`;
+document.head.appendChild(notifStyle);
+
+const notifData = [
+  {name:'Lucas M.', flag:'🇫🇷', service:'1 000 abonnés Instagram', icon:'📸', price:'9,75€'},
+  {name:'Sarah K.', flag:'🇧🇪', service:'500 likes TikTok', icon:'🎵', price:'4,00€'},
+  {name:'Thomas R.', flag:'🇨🇭', service:'5 000 vues Reels', icon:'▶️', price:'0,95€'},
+  {name:'Emma D.', flag:'🇫🇷', service:'2 000 followers TikTok', icon:'🎵', price:'17,80€'},
+  {name:'Hugo B.', flag:'🇫🇷', service:'10 000 vues YouTube', icon:'▶️', price:'2,90€'},
+  {name:'Léa V.', flag:'🇧🇪', service:'1 000 likes Instagram', icon:'❤️', price:'3,90€'},
+  {name:'Nathan P.', flag:'🇫🇷', service:'500 abonnés Instagram', icon:'📸', price:'4,88€'},
+  {name:'Jade M.', flag:'🇨🇭', service:'3 000 vues Reels', icon:'▶️', price:'0,57€'},
+  {name:'Rayan A.', flag:'🇫🇷', service:'1 000 followers TikTok', icon:'🎵', price:'8,90€'},
+  {name:'Inès L.', flag:'🇫🇷', service:'500 likes TikTok', icon:'❤️', price:'4,00€'},
+  {name:'Mathis C.', flag:'🇧🇪', service:'2 000 abonnés YouTube', icon:'▶️', price:'12,00€'},
+  {name:'Zoé T.', flag:'🇫🇷', service:'10 commentaires Instagram', icon:'💬', price:'14,90€'},
+];
+
+const times = ['il y a 1 min','il y a 2 min','il y a 3 min','il y a 5 min','il y a 7 min','il y a 12 min','il y a 18 min','il y a 24 min'];
+
+let notifEl = null;
+let notifIndex = 0;
+
+function createNotif(){
+  if(notifEl) notifEl.remove();
+  const d = notifData[notifIndex % notifData.length];
+  const t = times[Math.floor(Math.random()*times.length)];
+  notifIndex++;
+
+  notifEl = document.createElement('div');
+  notifEl.className = 'purchase-notif';
+  notifEl.innerHTML = `
+    <div class="notif-dot"></div>
+    <div class="notif-icon">${d.icon}</div>
+    <div class="notif-content">
+      <div class="notif-name">${d.flag} ${d.name}</div>
+      <div class="notif-service">${d.service}</div>
+      <div class="notif-footer">
+        <span class="notif-time">${t}</span>
+        <span class="notif-price">${d.price}</span>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(notifEl);
+
+  // Show
+  setTimeout(() => notifEl.classList.add('show'), 100);
+
+  // Hide after 5s
+  setTimeout(() => {
+    if(notifEl) notifEl.classList.add('hide');
+    setTimeout(() => { if(notifEl){ notifEl.remove(); notifEl=null; } }, 500);
+  }, 5000);
+}
+
+// Start after 3s, then every 18-30s
+setTimeout(() => {
+  createNotif();
+  setInterval(createNotif, Math.random()*12000 + 18000);
+}, 3000);
+
 /* ── SCROLL REVEAL ── */
 function initReveal(){
   const els = document.querySelectorAll('.section, .services-bg .section, .section-sm, .cta-band');
