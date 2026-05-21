@@ -907,65 +907,6 @@ function openOrder(name, plat, price, min, max){
   document.getElementById('ov').classList.add('on');
 }
 
-function calcTotal(){
-  const qty = parseInt(document.getElementById('m-qty').value) || 0;
-  const total = (qty / 1000 * currentPrice).toFixed(2);
-  document.getElementById('m-total').textContent = qty > 0 ? total + ' €' : '—';
-}
-
-async function submitOrder(){
-  const email = document.getElementById('m-email').value.trim();
-  const link = document.getElementById('m-link').value.trim();
-  const qty = parseInt(document.getElementById('m-qty').value) || 0;
-  const amount = parseFloat((qty / 1000 * currentPrice).toFixed(2));
-
-  if(!email || !email.includes('@')){
-    alert('Merci d\'entrer un email valide');
-    return;
-  }
-  if(!link){
-    alert('Merci d\'entrer le lien de ton profil ou publication');
-    return;
-  }
-  if(qty < 1){
-    alert('Merci d\'entrer une quantité');
-    return;
-  }
-  if(amount < 0.5){
-    alert('Le montant minimum est de 0,50€');
-    return;
-  }
-
-  const btn = document.getElementById('m-submit-btn');
-  btn.textContent = 'Redirection...';
-  btn.disabled = true;
-
-  try {
-    const res = await fetch(`${API}/api/create-checkout`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        service: currentService,
-        platform: currentPlatform,
-        link, quantity: qty,
-        amount, email
-      })
-    });
-    const data = await res.json();
-    if(data.url){
-      window.location.href = data.url;
-    } else {
-      alert('Erreur : ' + (data.error || 'Réessaie'));
-      btn.textContent = 'PAYER MAINTENANT →';
-      btn.disabled = false;
-    }
-  } catch(err) {
-    alert('Erreur de connexion. Réessaie.');
-    btn.textContent = 'PAYER MAINTENANT →';
-    btn.disabled = false;
-  }
-}
-
 function closeM(){document.getElementById('ov').classList.remove('on')}
 function closeOut(e){if(e.target===document.getElementById('ov'))closeM()}
 
