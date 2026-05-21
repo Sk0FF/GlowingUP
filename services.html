@@ -673,9 +673,21 @@ nav{position:fixed;inset:0 0 auto;z-index:200;display:flex;align-items:center;ju
     <div class="fg"><label class="fl">Ton email</label><input type="email" class="fi" id="m-email" placeholder="toi@exemple.com"></div>
     <div class="fg"><label class="fl">Lien du profil / publication</label><input type="text" class="fi" id="m-link" placeholder="https://instagram.com/ton_profil"></div>
     <div class="fg"><label class="fl">Quantité</label><input type="number" class="fi" id="m-qty" placeholder="Ex: 1000" oninput="calcTotal()"></div>
+    <!-- PROMO CODE -->
+    <div class="fg">
+      <label class="fl">Code promo (optionnel)</label>
+      <div style="display:flex;gap:8px">
+        <input type="text" class="fi" id="m-promo" placeholder="Ex: GLOW20" style="text-transform:uppercase;flex:1" oninput="this.value=this.value.toUpperCase()">
+        <button onclick="applyPromo()" style="background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);padding:0 16px;border-radius:9px;font-size:12px;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;cursor:pointer;white-space:nowrap;transition:all .2s" onmouseover="this.style.background='var(--green)';this.style.color='#020902'" onmouseout="this.style.background='var(--green-dim)';this.style.color='var(--green)'">APPLIQUER</button>
+      </div>
+      <div id="m-promo-msg" style="font-size:12px;margin-top:6px;display:none"></div>
+    </div>
     <div class="m-total">
       <span class="m-total-label">Total</span>
-      <span class="m-total-price" id="m-total">—</span>
+      <div style="text-align:right">
+        <div id="m-original-price" style="font-size:12px;color:var(--text3);text-decoration:line-through;display:none"></div>
+        <span class="m-total-price" id="m-total">—</span>
+      </div>
     </div>
     <button class="m-submit" id="m-submit-btn" onclick="submitOrder()">PAYER MAINTENANT →</button>
     <div class="m-note">🔒 Paiement sécurisé via Stripe · Livraison garantie · Support 24/7</div>
@@ -687,6 +699,152 @@ const API = 'https://glowingup-backend-production.up.railway.app';
 let currentPrice = 0;
 let currentService = '';
 let currentPlatform = '';
+let appliedDiscount = 0;
+let appliedCode = '';
+
+function toggleDetail(id){
+  const row = document.getElementById(id);
+  row.classList.toggle('open');
+}
+
+function filterPlatform(platform, btn){
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.platform-section').forEach(s => {
+    if(platform === 'all'){s.classList.remove('hidden')}
+    else{s.dataset.platform === platform ? s.classList.remove('hidden') : s.classList.add('hidden')}
+  });
+}
+
+function filterSearch(){
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  document.querySelectorAll('.platform-section').forEach(section => {
+    let hasVisible = false;
+    section.querySelectorAll('tbody tr:not(.detail-row)').forEach(row => {
+      const name = row.querySelector('.svc-name').textContent.toLowerCase();
+      const match = name.includes(q);
+      row.style.display = match ? '' : 'none';
+      const id = row.getAttribute('onclick').match(/'([^']+)'/)?.[1];
+      if(id) document.getElementById(id).style.display = 'none';
+      if(match) hasVisible = true;
+    });
+    section.style.display = hasVisible ? '' : 'none';
+  });
+}
+
+function openOrder(name, plat, price, min, max){
+  currentService = name;
+  currentPlatform = plat;
+  currentPrice = parseFloat(price.replace(',','.'));
+  appliedDiscount = 0;
+  appliedCode = '';
+  document.getElementById('m-svc-name').textContent = name;
+  document.getElementById('m-svc-plat').textContent = plat;
+  document.getElementById('m-price').textContent = price + ' €';
+  document.getElementById('m-minmax').textContent = min + ' — ' + max;
+  document.getElementById('m-email').value = '';
+  document.getElementById('m-link').value = '';
+  document.getElementById('m-qty').value = '';
+  document.getElementById('m-promo').value = '';
+  document.getElementById('m-total').textContent = '—';
+  document.getElementById('m-promo-msg').style.display = 'none';
+  document.getElementById('m-original-price').style.display = 'none';
+  document.getElementById('m-submit-btn').textContent = 'PAYER MAINTENANT →';
+  document.getElementById('m-submit-btn').disabled = false;
+  document.getElementById('ov').classList.add('on');
+}
+
+function calcTotal(){
+  const qty = parseInt(document.getElementById('m-qty').value) || 0;
+  if(qty <= 0){ document.getElementById('m-total').textContent = '—'; return; }
+  const base = parseFloat((qty / 1000 * currentPrice).toFixed(2));
+  if(appliedDiscount > 0){
+    const discounted = parseFloat((base * (1 - appliedDiscount/100)).toFixed(2));
+    document.getElementById('m-original-price').textContent = base.toFixed(2) + ' €';
+    document.getElementById('m-original-price').style.display = 'block';
+    document.getElementById('m-total').textContent = discounted + ' €';
+  } else {
+    document.getElementById('m-original-price').style.display = 'none';
+    document.getElementById('m-total').textContent = base + ' €';
+  }
+}
+
+async function applyPromo(){
+  const code = document.getElementById('m-promo').value.trim().toUpperCase();
+  const email = document.getElementById('m-email').value.trim();
+  const msg = document.getElementById('m-promo-msg');
+  if(!code){ msg.textContent = '⚠️ Entre un code promo'; msg.style.color='#ffaa33'; msg.style.display='block'; return; }
+  try {
+    const res = await fetch(`${API}/api/promo/check`, {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ code, email })
+    });
+    const data = await res.json();
+    if(data.valid){
+      appliedDiscount = data.discount;
+      appliedCode = data.code;
+      msg.textContent = `✓ Code appliqué — -${data.discount}% de réduction !`;
+      msg.style.color = '#4dff7c';
+      msg.style.display = 'block';
+      calcTotal();
+    } else {
+      appliedDiscount = 0; appliedCode = '';
+      msg.textContent = '✗ ' + (data.error || 'Code invalide');
+      msg.style.color = '#ff4d4d';
+      msg.style.display = 'block';
+    }
+  } catch {
+    msg.textContent = '✗ Erreur de vérification';
+    msg.style.color = '#ff4d4d';
+    msg.style.display = 'block';
+  }
+}
+
+async function submitOrder(){
+  const email = document.getElementById('m-email').value.trim();
+  const link = document.getElementById('m-link').value.trim();
+  const qty = parseInt(document.getElementById('m-qty').value) || 0;
+  const originalAmount = parseFloat((qty / 1000 * currentPrice).toFixed(2));
+  const amount = appliedDiscount > 0
+    ? parseFloat((originalAmount * (1 - appliedDiscount/100)).toFixed(2))
+    : originalAmount;
+
+  if(!email || !email.includes('@')){ alert('Merci d\'entrer un email valide'); return; }
+  if(!link){ alert('Merci d\'entrer le lien de ton profil ou publication'); return; }
+  if(qty < 1){ alert('Merci d\'entrer une quantité'); return; }
+  if(amount < 0.5){ alert('Le montant minimum est de 0,50€'); return; }
+
+  const btn = document.getElementById('m-submit-btn');
+  btn.textContent = 'Redirection...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(`${API}/api/create-checkout`, {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        service: currentService, platform: currentPlatform,
+        link, quantity: qty, amount, email,
+        promo_code: appliedCode || null,
+        original_amount: originalAmount
+      })
+    });
+    const data = await res.json();
+    if(data.url){ window.location.href = data.url; }
+    else {
+      alert('Erreur : ' + (data.error || 'Réessaie'));
+      btn.textContent = 'PAYER MAINTENANT →';
+      btn.disabled = false;
+    }
+  } catch {
+    alert('Erreur de connexion. Réessaie.');
+    btn.textContent = 'PAYER MAINTENANT →';
+    btn.disabled = false;
+  }
+}
+
+function closeM(){document.getElementById('ov').classList.remove('on')}
+function closeOut(e){if(e.target===document.getElementById('ov'))closeM()}
 
 function toggleDetail(id){
   const row = document.getElementById(id);
