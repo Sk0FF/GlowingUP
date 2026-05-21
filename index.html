@@ -687,35 +687,6 @@ function addShimmer(){
   });
 }
 
-/* Number counter for stats */
-function animateCounters(){
-  document.querySelectorAll('.counter').forEach(el => {
-    const target = parseInt(el.dataset.target);
-    const suffix = el.dataset.suffix||'';
-    const duration = 2000;
-    const step = target/duration*16;
-    let current = 0;
-    const timer = setInterval(()=>{
-      current += step;
-      if(current>=target){current=target;clearInterval(timer)}
-      let display;
-      if(target>=1000000) display=(current/1000000).toFixed(1);
-      else if(target>=1000) display=Math.round(current/1000);
-      else if(el.dataset.decimal) display=(current/10).toFixed(1);
-      else display=Math.round(current);
-      el.textContent=display+suffix;
-    },16);
-  });
-}
-
-const statsWrap = document.querySelector('.stats-wrap');
-if(statsWrap){
-  const obs2 = new IntersectionObserver(entries=>{
-    if(entries[0].isIntersecting){animateCounters();obs2.disconnect()}
-  },{threshold:.3});
-  obs2.observe(statsWrap);
-}
-
 // Init on load
 window.addEventListener('load', () => {
   setTimeout(() => {
