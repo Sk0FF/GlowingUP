@@ -756,16 +756,22 @@ function openOrder(name, plat, price, min, max){
 
 function calcTotal(){
   const qty = parseInt(document.getElementById('m-qty').value) || 0;
-  if(qty <= 0){ document.getElementById('m-total').textContent = '—'; return; }
+  if(qty <= 0){
+    document.getElementById('m-total').textContent = '—';
+    document.getElementById('m-original-price').style.display = 'none';
+    return;
+  }
   const base = parseFloat((qty / 1000 * currentPrice).toFixed(2));
   if(appliedDiscount > 0){
     const discounted = parseFloat((base * (1 - appliedDiscount/100)).toFixed(2));
     document.getElementById('m-original-price').textContent = base.toFixed(2) + ' €';
     document.getElementById('m-original-price').style.display = 'block';
-    document.getElementById('m-total').textContent = discounted + ' €';
+    document.getElementById('m-total').textContent = discounted.toFixed(2) + ' €';
+    document.getElementById('m-total').style.color = '#4dff7c';
   } else {
     document.getElementById('m-original-price').style.display = 'none';
-    document.getElementById('m-total').textContent = base + ' €';
+    document.getElementById('m-total').textContent = base.toFixed(2) + ' €';
+    document.getElementById('m-total').style.color = '';
   }
 }
 
@@ -786,12 +792,13 @@ async function applyPromo(){
       msg.textContent = `✓ Code appliqué — -${data.discount}% de réduction !`;
       msg.style.color = '#4dff7c';
       msg.style.display = 'block';
-      calcTotal();
+      calcTotal(); // recalculate after setting discount
     } else {
       appliedDiscount = 0; appliedCode = '';
       msg.textContent = '✗ ' + (data.error || 'Code invalide');
       msg.style.color = '#ff4d4d';
       msg.style.display = 'block';
+      calcTotal();
     }
   } catch {
     msg.textContent = '✗ Erreur de vérification';
@@ -804,15 +811,17 @@ async function submitOrder(){
   const email = document.getElementById('m-email').value.trim();
   const link = document.getElementById('m-link').value.trim();
   const qty = parseInt(document.getElementById('m-qty').value) || 0;
-  const originalAmount = parseFloat((qty / 1000 * currentPrice).toFixed(2));
-  const amount = appliedDiscount > 0
-    ? parseFloat((originalAmount * (1 - appliedDiscount/100)).toFixed(2))
-    : originalAmount;
 
   if(!email || !email.includes('@')){ alert('Merci d\'entrer un email valide'); return; }
   if(!link){ alert('Merci d\'entrer le lien de ton profil ou publication'); return; }
   if(qty < 1){ alert('Merci d\'entrer une quantité'); return; }
-  if(amount < 0.5){ alert('Le montant minimum est de 0,50€'); return; }
+
+  const originalAmount = parseFloat((qty / 1000 * currentPrice).toFixed(2));
+  const finalAmount = appliedDiscount > 0
+    ? parseFloat((originalAmount * (1 - appliedDiscount/100)).toFixed(2))
+    : originalAmount;
+
+  if(finalAmount < 0.5){ alert('Le montant minimum est de 0,50€'); return; }
 
   const btn = document.getElementById('m-submit-btn');
   btn.textContent = 'Redirection...';
@@ -823,15 +832,20 @@ async function submitOrder(){
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({
-        service: currentService, platform: currentPlatform,
-        link, quantity: qty, amount, email,
+        service: currentService,
+        platform: currentPlatform,
+        link,
+        quantity: qty,
+        amount: finalAmount,
+        email,
         promo_code: appliedCode || null,
         original_amount: originalAmount
       })
     });
     const data = await res.json();
-    if(data.url){ window.location.href = data.url; }
-    else {
+    if(data.url){
+      window.location.href = data.url;
+    } else {
       alert('Erreur : ' + (data.error || 'Réessaie'));
       btn.textContent = 'PAYER MAINTENANT →';
       btn.disabled = false;
