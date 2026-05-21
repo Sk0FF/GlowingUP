@@ -138,6 +138,10 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a10 10 0 0 1 10 10H12z"/></svg>
       Analyse
     </div>
+    <div class="nav-item" onclick="showPage('promos')" id="nav-promos">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+      Codes Promo
+    </div>
     <div class="sidebar-bottom">
       <button class="btn-logout" onclick="logout()">Se déconnecter</button>
     </div>
@@ -316,6 +320,53 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle}
   </div>
 </div>
 
+<!-- PROMO PAGE -->
+<div class="page" id="page-promos" style="display:none;margin-left:220px;padding:32px;min-height:100vh">
+  <div class="page-title">CODES PROMO</div>
+  <div class="page-sub">Gérez vos codes de réduction</div>
+
+  <!-- CREATE FORM -->
+  <div style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:24px">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--white);margin-bottom:20px">CRÉER UN CODE</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;flex-wrap:wrap">
+      <div>
+        <div class="stat-label" style="margin-bottom:6px">Code</div>
+        <input type="text" id="new-code" class="search-input" placeholder="Ex: SUMMER30" style="width:100%;text-transform:uppercase" oninput="this.value=this.value.toUpperCase()">
+      </div>
+      <div>
+        <div class="stat-label" style="margin-bottom:6px">Réduction (%)</div>
+        <input type="number" id="new-discount" class="search-input" placeholder="Ex: 20" min="1" max="100" style="width:100%">
+      </div>
+      <div>
+        <div class="stat-label" style="margin-bottom:6px">Utilisations max</div>
+        <input type="number" id="new-maxuses" class="search-input" placeholder="Ex: 100" min="1" style="width:100%">
+      </div>
+      <button onclick="createPromo()" style="background:var(--green);border:none;color:#020902;padding:10px 20px;border-radius:9px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;white-space:nowrap;transition:all .2s" onmouseover="this.style.filter='brightness(1.08)'" onmouseout="this.style.filter=''">CRÉER →</button>
+    </div>
+    <div id="promo-create-msg" style="font-size:12px;margin-top:10px;display:none"></div>
+  </div>
+
+  <!-- PROMO LIST -->
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Réduction</th>
+          <th>Utilisations</th>
+          <th>Max</th>
+          <th>Statut</th>
+          <th>Créé le</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="promosTable">
+        <tr><td colspan="7"><div class="empty"><div class="empty-icon">🏷️</div><div class="empty-text">Chargement...</div></div></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -431,11 +482,13 @@ function renderAnalyse(){
 }
 
 function showPage(page){
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active');p.style.display='none'});
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
-  document.getElementById('page-'+page).classList.add('active');
+  const pageEl = document.getElementById('page-'+page);
+  if(pageEl){ pageEl.classList.add('active'); pageEl.style.display='block'; }
   document.getElementById('nav-'+page).classList.add('active');
   if(page==='analyse') setTimeout(renderAnalyse, 100);
+  if(page==='promos') loadPromos();
 }
 
 async function loadOrders(){
@@ -700,6 +753,87 @@ function showToast(msg){
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+/* ── PROMO CODES ── */
+async function loadPromos(){
+  try {
+    const res = await fetch(`${API}/api/admin/promos`,{headers:{'Authorization':'Bearer '+token}});
+    const promos = await res.json();
+    const tbody = document.getElementById('promosTable');
+    if(!promos.length){
+      tbody.innerHTML='<tr><td colspan="7"><div class="empty"><div class="empty-icon">🏷️</div><div class="empty-text">Aucun code promo</div></div></td></tr>';
+      return;
+    }
+    tbody.innerHTML = promos.map(p => `
+      <tr>
+        <td><span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--green)">${p.code}</span></td>
+        <td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white)">-${p.discount}%</span></td>
+        <td style="font-size:13px;color:var(--text)">${p.uses}</td>
+        <td style="font-size:13px;color:var(--text3)">${p.max_uses}</td>
+        <td>
+          <span class="status-badge ${p.active ? 'status-delivered' : 'status-cancelled'}">
+            ${p.active ? '✓ Actif' : '✗ Inactif'}
+          </span>
+        </td>
+        <td class="td-date">${new Date(p.created_at).toLocaleDateString('fr-FR')}</td>
+        <td style="display:flex;gap:6px;align-items:center">
+          <button onclick="togglePromo(${p.id}, ${p.active ? 0 : 1})" style="background:none;border:1px solid var(--line);color:var(--text3);padding:5px 10px;border-radius:6px;font-size:11px;cursor:pointer;transition:all .18s" onmouseover="this.style.borderColor='var(--green-border)';this.style.color='var(--green)'" onmouseout="this.style.borderColor='var(--line)';this.style.color='var(--text3)'">${p.active ? 'Désactiver' : 'Activer'}</button>
+          <button onclick="deletePromo(${p.id})" class="btn-delete">🗑</button>
+        </td>
+      </tr>
+    `).join('');
+  } catch { showToast('Erreur chargement promos'); }
+}
+
+async function createPromo(){
+  const code = document.getElementById('new-code').value.trim().toUpperCase();
+  const discount = parseInt(document.getElementById('new-discount').value);
+  const maxUses = parseInt(document.getElementById('new-maxuses').value) || 9999;
+  const msg = document.getElementById('promo-create-msg');
+
+  if(!code){ msg.textContent='⚠️ Entre un code'; msg.style.color='#ffaa33'; msg.style.display='block'; return; }
+  if(!discount || discount < 1 || discount > 100){ msg.textContent='⚠️ Entre un % valide (1-100)'; msg.style.color='#ffaa33'; msg.style.display='block'; return; }
+
+  try {
+    const res = await fetch(`${API}/api/admin/promos`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({code, discount, max_uses: maxUses})
+    });
+    const data = await res.json();
+    if(data.success){
+      document.getElementById('new-code').value='';
+      document.getElementById('new-discount').value='';
+      document.getElementById('new-maxuses').value='';
+      msg.textContent='✓ Code créé !'; msg.style.color='var(--green)'; msg.style.display='block';
+      setTimeout(()=>msg.style.display='none', 3000);
+      loadPromos();
+      showToast('Code promo créé ✓');
+    } else {
+      msg.textContent='✗ '+(data.error||'Erreur'); msg.style.color='#ff4d4d'; msg.style.display='block';
+    }
+  } catch { msg.textContent='✗ Erreur'; msg.style.color='#ff4d4d'; msg.style.display='block'; }
+}
+
+async function togglePromo(id, active){
+  await fetch(`${API}/api/admin/promos/${id}`,{
+    method:'PATCH',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+    body: JSON.stringify({active})
+  });
+  loadPromos();
+  showToast(active ? 'Code activé ✓' : 'Code désactivé');
+}
+
+async function deletePromo(id){
+  if(!confirm('Supprimer ce code promo ?')) return;
+  await fetch(`${API}/api/admin/promos/${id}`,{
+    method:'DELETE',
+    headers:{'Authorization':'Bearer '+token}
+  });
+  loadPromos();
+  showToast('Code supprimé');
 }
 
 // Auto refresh every 30s
