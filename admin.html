@@ -142,6 +142,10 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
       Codes Promo
     </div>
+    <div class="nav-item" onclick="showPage('traffic')" id="nav-traffic">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      Trafic
+    </div>
     <div class="sidebar-bottom">
       <button class="btn-logout" onclick="logout()">Se déconnecter</button>
     </div>
@@ -368,6 +372,88 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle}
   </div>
 </div>
 
+<!-- TRAFFIC PAGE -->
+<div class="page" id="page-traffic" style="display:none;margin-left:220px;padding:32px;min-height:100vh">
+  <div class="page-title">TRAFIC</div>
+  <div class="page-sub">Statistiques de visites en temps réel via Google Analytics</div>
+
+  <!-- QUICK STATS -->
+  <div class="stats-row" style="margin-bottom:24px">
+    <div class="stat-card">
+      <div class="stat-label">Visiteurs aujourd'hui</div>
+      <div class="stat-value green" id="traffic-today">—</div>
+      <div class="stat-sub">Utilisateurs actifs</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Page la + visitée</div>
+      <div style="font-size:13px;font-weight:600;color:var(--white);margin-top:6px" id="traffic-top-page">—</div>
+      <div class="stat-sub">Ce mois</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Taux de rebond</div>
+      <div class="stat-value" id="traffic-bounce">—</div>
+      <div class="stat-sub">Quittent sans cliquer</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Durée moyenne</div>
+      <div class="stat-value" id="traffic-duration">—</div>
+      <div class="stat-sub">Par session</div>
+    </div>
+  </div>
+
+  <!-- GA EMBED INFO -->
+  <div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:32px;text-align:center;margin-bottom:20px">
+    <div style="font-size:40px;margin-bottom:16px">📊</div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--white);margin-bottom:8px">GOOGLE ANALYTICS CONNECTÉ</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.7">Ton ID de mesure <span style="color:var(--green);font-family:'Bebas Neue',sans-serif;letter-spacing:1px">G-PHDEL235TR</span> est actif sur toutes les pages.<br>Les données apparaissent dans Google Analytics après quelques heures.</div>
+    <a href="https://analytics.google.com" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:var(--green);color:#020902;padding:12px 28px;border-radius:9px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;text-decoration:none;transition:all .2s">
+      OUVRIR GOOGLE ANALYTICS →
+    </a>
+  </div>
+
+  <!-- PAGES TRACKED -->
+  <div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--white);margin-bottom:20px">PAGES TRACKÉES</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></div>
+          <span style="font-size:13px;color:var(--text)">Accueil</span>
+        </div>
+        <span style="font-size:11px;color:var(--text3)">index.html</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></div>
+          <span style="font-size:13px;color:var(--text)">Services</span>
+        </div>
+        <span style="font-size:11px;color:var(--text3)">services.html</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></div>
+          <span style="font-size:13px;color:var(--text)">Connexion / Inscription</span>
+        </div>
+        <span style="font-size:11px;color:var(--text3)">login.html</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></div>
+          <span style="font-size:13px;color:var(--text)">Mon Compte</span>
+        </div>
+        <span style="font-size:11px;color:var(--text3)">compte.html</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></div>
+          <span style="font-size:13px;color:var(--text)">Confirmation commande</span>
+        </div>
+        <span style="font-size:11px;color:var(--text3)">success.html</span>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
@@ -486,7 +572,7 @@ function showPage(page){
   document.querySelectorAll('.page').forEach(p=>{p.classList.remove('active')});
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   const pageEl = document.getElementById('page-'+page);
-  if(pageEl) pageEl.classList.add('active');
+  if(pageEl){ pageEl.classList.add('active'); pageEl.style.display='block'; }
   const navEl = document.getElementById('nav-'+page);
   if(navEl) navEl.classList.add('active');
   if(page==='analyse') setTimeout(renderAnalyse, 100);
