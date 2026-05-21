@@ -4,269 +4,245 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>GlowingUp — Booste tes réseaux sociaux</title>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#060808;--surface:#0c0f0d;--card:#101310;--card2:#131714;
-  --line:#1c211d;--line2:#232923;
-  --green:#5dff8a;--green-dim:rgba(93,255,138,.1);--green-border:rgba(93,255,138,.18);
-  --text:#e8ede9;--text2:#9aa89c;--text3:#5a665c;--white:#f5faf6;
+  --bg:#050707;--surface:#0a0d0b;--card:#0f1210;--card2:#121512;
+  --line:#1a1f1b;--line2:#202620;
+  --green:#4dff7c;--green2:#3de66a;
+  --green-dim:rgba(77,255,124,.09);--green-border:rgba(77,255,124,.2);
+  --text:#e5ede7;--text2:#8fa893;--text3:#4d5e50;--white:#f0f8f2;
 }
 html{scroll-behavior:smooth}
 body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.6;overflow-x:hidden}
 
-/* NAV */
-nav{position:fixed;inset:0 0 auto;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 48px;height:60px;border-bottom:1px solid var(--line);background:rgba(6,8,8,.88);backdrop-filter:blur(16px)}
-.n-logo{font-family:'Instrument Serif',serif;font-size:19px;color:var(--white);display:flex;align-items:center;gap:7px;letter-spacing:-.2px}
-.n-dot{width:7px;height:7px;border-radius:50%;background:var(--green);flex-shrink:0}
-.n-links{display:flex;gap:28px;list-style:none}
-.n-links a{color:var(--text3);text-decoration:none;font-size:13px;font-weight:500;transition:color .18s}
-.n-links a:hover{color:var(--text)}
-.n-right{display:flex;gap:8px;align-items:center}
-.btn-login{border:1px solid var(--line2);background:none;color:var(--text2);padding:7px 18px;border-radius:7px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .18s}
-.btn-login:hover{border-color:var(--green-border);color:var(--green)}
-.btn-cta{background:var(--green);border:none;color:#040a05;padding:8px 20px;border-radius:7px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:5px}
-.btn-cta:hover{filter:brightness(1.08);transform:translateY(-1px)}
+/* ── CANVAS BG ── */
+#bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5}
 
-/* HERO */
-.hero{padding:140px 48px 100px;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center;min-height:100vh}
-.hero-pill{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--green-border);background:var(--green-dim);color:var(--green);font-size:12px;font-weight:500;padding:5px 14px;border-radius:100px;margin-bottom:28px;letter-spacing:.3px}
-.hero-pill-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
-h1{font-family:'Instrument Serif',serif;font-size:clamp(44px,5.5vw,68px);font-weight:400;line-height:1.07;letter-spacing:-.5px;color:var(--white);margin-bottom:20px}
-h1 em{font-style:italic;color:var(--green)}
-.hero-p{color:var(--text2);font-size:16px;line-height:1.7;max-width:440px;margin-bottom:32px;font-weight:300}
-.hero-trust{display:flex;align-items:center;gap:16px;margin-bottom:32px;flex-wrap:wrap}
-.trust-chip{display:flex;align-items:center;gap:6px;color:var(--text3);font-size:12px;font-weight:500}
-.trust-chip svg{width:12px;height:12px;color:var(--green);flex-shrink:0}
-.trust-divider{width:1px;height:14px;background:var(--line2)}
-.hero-btns{display:flex;gap:10px;flex-wrap:wrap}
-.btn-hero{background:var(--green);border:none;color:#040a05;padding:13px 26px;border-radius:9px;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:all .2s}
-.btn-hero:hover{filter:brightness(1.08);transform:translateY(-2px);box-shadow:0 8px 28px rgba(93,255,138,.22)}
-.btn-hero-out{border:1px solid var(--line2);background:none;color:var(--text2);padding:13px 26px;border-radius:9px;font-size:14px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .2s}
+/* ── NAV ── */
+nav{position:fixed;inset:0 0 auto;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:64px;border-bottom:1px solid var(--line);background:rgba(5,7,7,.85);backdrop-filter:blur(20px)}
+.n-logo{font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--white);display:flex;align-items:center;gap:8px;text-decoration:none;letter-spacing:2px}
+.n-dot{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green);animation:glow 2s infinite}
+@keyframes glow{0%,100%{box-shadow:0 0 8px var(--green)}50%{box-shadow:0 0 20px var(--green),0 0 40px rgba(77,255,124,.3)}}
+.n-links{display:flex;gap:32px;list-style:none}
+.n-links a{color:var(--text3);text-decoration:none;font-size:13px;font-weight:500;transition:color .2s;letter-spacing:.5px;text-transform:uppercase}
+.n-links a:hover,.n-links a.active{color:var(--text)}
+.n-right{display:flex;gap:10px}
+.btn-login{border:1px solid var(--line2);background:none;color:var(--text2);padding:8px 20px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .2s;letter-spacing:.3px}
+.btn-login:hover{border-color:var(--green-border);color:var(--green)}
+.btn-cta{background:var(--green);border:none;color:#020902;padding:9px 22px;border-radius:8px;font-size:13px;font-family:'Bebas Neue',sans-serif;font-weight:400;cursor:pointer;transition:all .2s;letter-spacing:2px}
+.btn-cta:hover{background:var(--green2);transform:translateY(-1px);box-shadow:0 4px 20px rgba(77,255,124,.3)}
+
+/* ── HERO ── */
+.hero{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 32px 80px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--green-border);background:var(--green-dim);color:var(--green);font-size:11px;font-weight:600;padding:6px 18px;border-radius:100px;margin-bottom:36px;letter-spacing:1.5px;text-transform:uppercase;animation:fadeUp .5s ease both}
+.badge-dot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:glow 2s infinite}
+.hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(80px,13vw,160px);line-height:.95;letter-spacing:4px;color:var(--white);margin-bottom:8px;animation:fadeUp .5s .1s ease both}
+.hero-title .line2{display:block;color:var(--green);text-shadow:0 0 40px rgba(77,255,124,.4);animation:fadeUp .5s .15s ease both}
+.hero-title .line3{display:block;font-size:clamp(40px,6vw,80px);color:var(--text3);letter-spacing:8px;animation:fadeUp .5s .2s ease both}
+.hero-sub{color:var(--text2);font-size:17px;max-width:500px;margin:28px auto 0;line-height:1.7;font-weight:300;animation:fadeUp .5s .25s ease both}
+.hero-chips{display:flex;align-items:center;justify-content:center;gap:20px;margin:24px 0 40px;flex-wrap:wrap;animation:fadeUp .5s .3s ease both}
+.chip{display:flex;align-items:center;gap:6px;color:var(--text3);font-size:12px;font-weight:500;letter-spacing:.3px}
+.chip svg{width:13px;height:13px;color:var(--green)}
+.chip-sep{width:3px;height:3px;border-radius:50%;background:var(--line2)}
+.hero-btns{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;animation:fadeUp .5s .35s ease both}
+.btn-hero-main{background:var(--green);border:none;color:#020902;padding:15px 34px;border-radius:10px;font-size:15px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;cursor:pointer;transition:all .25s}
+.btn-hero-main:hover{background:var(--green2);transform:translateY(-2px);box-shadow:0 8px 32px rgba(77,255,124,.3)}
+.btn-hero-out{border:1px solid var(--line2);background:none;color:var(--text2);padding:15px 34px;border-radius:10px;font-size:15px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .25s}
 .btn-hero-out:hover{border-color:var(--green-border);color:var(--text)}
 
-/* HERO CARDS */
-.hero-right{display:flex;flex-direction:column;gap:14px}
-.h-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px 24px}
-.h-card-label{font-size:11px;color:var(--text3);font-weight:500;text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px}
-.h-stats{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.h-stat-box{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
-.h-stat-num{font-family:'Instrument Serif',serif;font-size:26px;color:var(--white);line-height:1;margin-bottom:3px}
-.h-stat-num span{color:var(--green)}
-.h-stat-lbl{font-size:11px;color:var(--text3);font-weight:500;letter-spacing:.2px}
-.h-orders{display:flex;flex-direction:column;gap:8px}
-.h-order{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:9px;padding:10px 14px}
-.h-order-icon{font-size:15px;flex-shrink:0}
-.h-order-info{flex:1}
-.h-order-name{font-size:13px;font-weight:500;color:var(--text);line-height:1}
-.h-order-sub{font-size:11px;color:var(--text3);margin-top:2px}
-.h-order-badge{font-size:10px;font-weight:600;padding:3px 9px;border-radius:100px;background:rgba(93,255,138,.12);color:var(--green);border:1px solid var(--green-border);white-space:nowrap}
-.h-order-badge.pending{background:rgba(255,180,50,.1);color:#ffb432;border-color:rgba(255,180,50,.2)}
+/* ── STATS ── */
+.stats-wrap{position:relative;z-index:1;max-width:900px;margin:64px auto 0;border:1px solid var(--line);border-radius:20px;overflow:hidden;animation:fadeUp .5s .4s ease both;display:grid;grid-template-columns:repeat(4,1fr)}
+.stat-item{padding:28px 20px;text-align:center;border-right:1px solid var(--line);background:rgba(10,13,11,.7);backdrop-filter:blur(8px);transition:background .25s}
+.stat-item:last-child{border-right:none}
+.stat-item:hover{background:rgba(77,255,124,.04)}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--white);line-height:1;letter-spacing:2px}
+.stat-num .counter{color:var(--green)}
+.stat-lbl{color:var(--text3);font-size:11px;letter-spacing:1px;text-transform:uppercase;margin-top:4px;font-weight:500}
 
-/* LAYOUT */
-.divider{height:1px;background:var(--line);margin:0 48px}
-.section{padding:88px 48px;max-width:1100px;margin:0 auto}
-.section-sm{padding:72px 48px;max-width:860px;margin:0 auto}
-.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:18px}
-.eyebrow::before{content:'';width:18px;height:1px;background:var(--green)}
-.sec-h2{font-family:'Instrument Serif',serif;font-size:clamp(30px,4vw,48px);font-weight:400;line-height:1.1;letter-spacing:-.5px;color:var(--white);margin-bottom:14px}
-.sec-h2 em{font-style:italic;color:var(--green)}
-.sec-p{color:var(--text2);font-size:15px;line-height:1.7;max-width:460px;font-weight:300}
+/* ── DIVIDER ── */
+.divider{position:relative;z-index:1;height:1px;background:var(--line);margin:0 56px}
 
-/* PLATFORMS */
+/* ── SECTIONS ── */
+.section{position:relative;z-index:1;padding:96px 56px;max-width:1200px;margin:0 auto}
+.section-sm{position:relative;z-index:1;padding:80px 56px;max-width:860px;margin:0 auto}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:20px}
+.eyebrow::before{content:'';width:20px;height:1px;background:var(--green)}
+.sec-h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,6vw,80px);font-weight:400;line-height:1;letter-spacing:3px;color:var(--white);margin-bottom:16px}
+.sec-h2 em{font-style:normal;color:var(--green)}
+.sec-p{color:var(--text2);font-size:15px;line-height:1.7;max-width:480px;font-weight:300}
+
+/* ── PLATFORMS ── */
 .plat-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:48px}
-.plat-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 12px 20px;text-align:center;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
-.plat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:var(--green);transform:scaleX(0);transition:transform .25s}
-.plat-card:hover{border-color:var(--line2);transform:translateY(-3px)}
+.plat-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:28px 12px 22px;text-align:center;cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.plat-card::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--green);transform:scaleX(0);transition:transform .25s;box-shadow:0 0 10px var(--green)}
+.plat-card:hover{border-color:var(--line2);transform:translateY(-4px);background:var(--card2)}
 .plat-card:hover::after{transform:scaleX(1)}
-.plat-e{font-size:26px;margin-bottom:9px;display:block}
-.plat-n{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:3px}
+.plat-e{font-size:28px;margin-bottom:10px;display:block}
+.plat-n{font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;color:var(--text);margin-bottom:3px}
 .plat-s{font-size:10px;color:var(--text3)}
 
-/* SERVICES */
-.services-wrap{background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+/* ── SERVICES ── */
+.services-bg{position:relative;z-index:1;background:rgba(10,13,11,.6);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
 .svc-header{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:40px;gap:20px;flex-wrap:wrap}
-.btn-sm-out{border:1px solid var(--line2);background:none;color:var(--text3);padding:8px 18px;border-radius:7px;font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .18s;white-space:nowrap}
-.btn-sm-out:hover{border-color:var(--green-border);color:var(--green)}
-.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-.svc{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;transition:border-color .2s,transform .2s;cursor:pointer;position:relative;overflow:hidden}
-.svc:hover{border-color:var(--line2);transform:translateY(-2px)}
+.btn-outline{border:1px solid var(--line2);background:none;color:var(--text3);padding:10px 22px;border-radius:8px;font-size:12px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s;white-space:nowrap;letter-spacing:.3px}
+.btn-outline:hover{border-color:var(--green-border);color:var(--green)}
+.svc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.svc{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px;transition:all .25s;cursor:pointer;position:relative;overflow:hidden}
+.svc::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 0%,rgba(77,255,124,.05),transparent 60%);opacity:0;transition:opacity .25s}
+.svc:hover{border-color:var(--line2);transform:translateY(-3px)}
+.svc:hover::before{opacity:1}
 .svc.featured{border-color:var(--green-border)}
-.svc.featured::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent 0%,var(--green) 50%,transparent 100%)}
-.svc-top-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--green);background:var(--green-dim);border:1px solid var(--green-border);padding:3px 9px;border-radius:100px;margin-bottom:16px;letter-spacing:.3px}
-.svc-plat{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px}
-.svc-title{font-family:'Instrument Serif',serif;font-size:20px;font-weight:400;color:var(--white);margin-bottom:8px;line-height:1.2}
-.svc-desc{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:22px;font-weight:300}
+.svc.featured::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent)}
+.svc-badge{display:inline-flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--green);background:var(--green-dim);border:1px solid var(--green-border);padding:3px 10px;border-radius:100px;margin-bottom:16px;letter-spacing:.5px;text-transform:uppercase}
+.svc-plat{font-size:10px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}
+.svc-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--white);margin-bottom:8px;line-height:1.1}
+.svc-desc{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:24px;font-weight:300}
 .svc-foot{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
-.svc-price-big{font-family:'Instrument Serif',serif;font-size:26px;color:var(--white);line-height:1}
-.svc-price-big span{color:var(--green)}
-.svc-price-sub{font-size:10px;color:var(--text3);margin-top:3px;font-weight:500;letter-spacing:.2px}
-.btn-order{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);padding:9px 16px;border-radius:8px;font-size:12px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .18s;white-space:nowrap}
-.btn-order:hover{background:var(--green);color:#040a05}
+.svc-price{font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--green);letter-spacing:1px;line-height:1}
+.svc-unit{font-size:10px;color:var(--text3);margin-top:3px;letter-spacing:.5px;text-transform:uppercase}
+.btn-order{background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);padding:10px 18px;border-radius:9px;font-size:12px;font-weight:600;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;cursor:pointer;transition:all .2s;white-space:nowrap}
+.btn-order:hover{background:var(--green);color:#020902;box-shadow:0 4px 16px rgba(77,255,124,.3)}
 
-/* HOW */
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:56px;position:relative}
-.steps::before{content:'';position:absolute;top:28px;left:14%;right:14%;height:1px;background:var(--line);z-index:0}
-.step{text-align:center;padding:0 16px;z-index:1;position:relative}
-.step-n{width:56px;height:56px;border-radius:50%;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-family:'Instrument Serif',serif;font-size:18px;color:var(--green);transition:all .25s}
-.step:hover .step-n{border-color:var(--green-border);box-shadow:0 0 18px rgba(93,255,138,.15)}
-.step-t{font-size:14px;font-weight:600;color:var(--white);margin-bottom:6px;line-height:1.3}
-.step-d{font-size:12px;color:var(--text3);line-height:1.6;max-width:150px;margin:0 auto}
+/* ── STEPS ── */
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:60px;position:relative}
+.steps::before{content:'';position:absolute;top:30px;left:12%;right:12%;height:1px;background:linear-gradient(90deg,transparent,var(--line2),var(--line2),transparent);z-index:0}
+.step{text-align:center;padding:0 16px;z-index:1}
+.step-n{width:60px;height:60px;border-radius:50%;border:1px solid var(--line);background:var(--card);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--green);transition:all .3s}
+.step:hover .step-n{border-color:var(--green-border);box-shadow:0 0 24px rgba(77,255,124,.2)}
+.step-t{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;color:var(--white);margin-bottom:8px}
+.step-d{font-size:12px;color:var(--text3);line-height:1.65;max-width:150px;margin:0 auto;font-weight:400}
 
-/* FEATURES */
-.feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:48px}
-.feat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:24px 20px;transition:border-color .2s}
-.feat:hover{border-color:var(--line2)}
-.feat-icon{width:38px;height:38px;border-radius:10px;background:var(--green-dim);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:17px;margin-bottom:14px}
-.feat-t{font-size:14px;font-weight:600;color:var(--white);margin-bottom:7px;line-height:1.3}
-.feat-d{font-size:12px;color:var(--text3);line-height:1.6}
+/* ── FEATURES ── */
+.feat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:48px}
+.feat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 22px;transition:all .25s}
+.feat:hover{border-color:var(--line2);transform:translateY(-2px)}
+.feat-icon{width:42px;height:42px;border-radius:12px;background:var(--green-dim);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:16px}
+.feat-t{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:1px;color:var(--white);margin-bottom:8px}
+.feat-d{font-size:12px;color:var(--text3);line-height:1.65}
 
-/* TESTIMONIALS */
-.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:48px}
-.testi{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px}
-.testi-stars{font-size:12px;color:var(--green);letter-spacing:2px;margin-bottom:14px}
-.testi-q{font-family:'Instrument Serif',serif;font-size:16px;font-weight:400;font-style:italic;color:var(--text);line-height:1.55;margin-bottom:18px}
+/* ── TESTIMONIALS ── */
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:48px}
+.testi{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px;transition:border-color .2s}
+.testi:hover{border-color:var(--line2)}
+.testi-stars{font-size:13px;color:var(--green);letter-spacing:3px;margin-bottom:14px;text-shadow:0 0 8px rgba(77,255,124,.4)}
+.testi-q{font-size:14px;color:var(--text);line-height:1.6;margin-bottom:20px;font-weight:300;font-style:italic}
 .testi-foot{display:flex;align-items:center;gap:10px}
-.testi-av{width:32px;height:32px;border-radius:50%;background:var(--green-dim);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--green);flex-shrink:0}
+.testi-av{width:34px;height:34px;border-radius:50%;background:var(--green-dim);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--green);letter-spacing:1px;flex-shrink:0}
 .testi-name{font-size:13px;font-weight:600;color:var(--text)}
 .testi-badge{font-size:10px;color:var(--text3)}
 
-/* FAQ */
+/* ── FAQ ── */
 .faq-list{margin-top:48px;display:flex;flex-direction:column;gap:8px}
-.faq{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;transition:border-color .2s}
+.faq{background:var(--card);border:1px solid var(--line);border-radius:13px;overflow:hidden;transition:border-color .2s}
 .faq.open{border-color:var(--line2)}
-.faq-q{padding:17px 20px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:16px}
+.faq-q{padding:18px 22px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:16px}
 .faq-qt{font-size:14px;font-weight:500;color:var(--text);line-height:1.4}
-.faq-ic{width:26px;height:26px;border-radius:6px;flex-shrink:0;background:none;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:16px;transition:all .22s;line-height:1}
+.faq-ic{width:28px;height:28px;border-radius:7px;flex-shrink:0;background:none;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:16px;transition:all .22s;line-height:1}
 .faq.open .faq-ic{background:var(--green-dim);border-color:var(--green-border);color:var(--green);transform:rotate(45deg)}
-.faq-a{color:var(--text2);font-size:13px;line-height:1.7;padding:0 20px 16px;display:none;font-weight:300}
+.faq-a{color:var(--text2);font-size:13px;line-height:1.7;padding:0 22px 18px;display:none;font-weight:300}
 .faq.open .faq-a{display:block}
 
-/* CTA */
-.cta-band{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface);padding:80px 48px;text-align:center;position:relative;overflow:hidden}
-.cta-band::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:350px;pointer-events:none;background:radial-gradient(ellipse,rgba(93,255,138,.07) 0%,transparent 65%)}
-.cta-band h2{position:relative}
-.cta-band p{color:var(--text2);font-size:15px;max-width:420px;margin:14px auto 36px;font-weight:300;position:relative}
-.cta-band .btn-hero{position:relative;margin:0 auto;display:inline-flex;align-items:center;gap:8px;font-size:14px}
+/* ── CTA ── */
+.cta-band{position:relative;z-index:1;border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:rgba(10,13,11,.7);padding:96px 56px;text-align:center;overflow:hidden}
+.cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:400px;pointer-events:none;background:radial-gradient(ellipse,rgba(77,255,124,.08) 0%,transparent 65%)}
+.cta-band h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,8vw,100px);letter-spacing:4px;color:var(--white);position:relative;line-height:1}
+.cta-band h2 span{color:var(--green);text-shadow:0 0 40px rgba(77,255,124,.4)}
+.cta-band p{color:var(--text2);font-size:16px;max-width:440px;margin:16px auto 40px;font-weight:300;position:relative}
 
-/* FOOTER */
-footer{padding:32px 48px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;border-top:1px solid var(--line)}
-.f-logo{font-family:'Instrument Serif',serif;font-size:16px;color:var(--text2);display:flex;align-items:center;gap:6px}
-.f-links{display:flex;gap:22px}
-.f-links a{color:var(--text3);text-decoration:none;font-size:12px;transition:color .18s}
+/* ── FOOTER ── */
+footer{position:relative;z-index:1;padding:36px 56px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;border-top:1px solid var(--line)}
+.f-logo{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--text2);display:flex;align-items:center;gap:7px}
+.f-links{display:flex;gap:24px}
+.f-links a{color:var(--text3);text-decoration:none;font-size:12px;transition:color .18s;letter-spacing:.3px}
 .f-links a:hover{color:var(--text2)}
-.f-copy{font-size:11px;color:var(--text3)}
+.f-copy{font-size:11px;color:var(--text3);letter-spacing:.3px}
 
-/* MODAL */
-.overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.82);backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:20px}
+/* ── MODAL ── */
+.overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.85);backdrop-filter:blur(10px);align-items:center;justify-content:center;padding:20px}
 .overlay.on{display:flex}
-.modal{background:var(--card2);border:1px solid var(--line2);border-radius:20px;padding:36px;width:100%;max-width:400px;position:relative}
-.m-close{position:absolute;top:14px;right:14px;width:28px;height:28px;border-radius:6px;border:1px solid var(--line);background:none;color:var(--text3);cursor:pointer;font-size:15px;display:flex;align-items:center;justify-content:center;transition:all .18s}
+.modal{background:var(--card2);border:1px solid var(--line2);border-radius:22px;padding:40px;width:100%;max-width:400px;position:relative}
+.m-close{position:absolute;top:16px;right:16px;width:30px;height:30px;border-radius:7px;border:1px solid var(--line);background:none;color:var(--text3);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .18s}
 .m-close:hover{color:var(--text);border-color:var(--line2)}
-.m-logo{font-family:'Instrument Serif',serif;font-size:16px;color:var(--text2);display:flex;align-items:center;gap:6px;margin-bottom:22px}
-.m-logo-dot{width:6px;height:6px;border-radius:50%;background:var(--green)}
-.m-h{font-family:'Instrument Serif',serif;font-size:24px;color:var(--white);margin-bottom:4px}
-.m-sub{font-size:13px;color:var(--text3);margin-bottom:22px;font-weight:300}
-.m-tabs{display:flex;gap:4px;background:var(--bg);border-radius:9px;padding:4px;margin-bottom:22px}
-.m-tab{flex:1;padding:8px;border-radius:6px;border:none;background:none;color:var(--text3);cursor:pointer;font-size:13px;font-weight:500;font-family:'DM Sans',sans-serif;transition:all .18s}
-.m-tab.on{background:var(--card2);color:var(--text);border:1px solid var(--line)}
-.fg{margin-bottom:12px}
-.fl{display:block;font-size:11px;color:var(--text3);font-weight:500;letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px}
-.fi{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--white);padding:10px 13px;border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .18s}
+.m-logo{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--text2);display:flex;align-items:center;gap:7px;margin-bottom:24px}
+.m-logo-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green)}
+.m-h{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;color:var(--white);margin-bottom:4px}
+.m-sub{font-size:13px;color:var(--text3);margin-bottom:24px;font-weight:300}
+.m-tabs{display:flex;gap:4px;background:var(--bg);border-radius:10px;padding:4px;margin-bottom:24px}
+.m-tab{flex:1;padding:9px;border-radius:7px;border:none;background:none;color:var(--text3);cursor:pointer;font-size:12px;font-weight:600;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;transition:all .18s}
+.m-tab.on{background:var(--card2);color:var(--white);border:1px solid var(--line)}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:10px;color:var(--text3);font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px}
+.fi{width:100%;background:var(--bg);border:1px solid var(--line);color:var(--white);padding:11px 14px;border-radius:9px;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .18s}
 .fi:focus{border-color:var(--green-border)}
 .fi::placeholder{color:var(--text3)}
-.m-submit{width:100%;background:var(--green);border:none;color:#040a05;padding:12px;border-radius:9px;font-size:14px;font-weight:600;font-family:'DM Sans',sans-serif;cursor:pointer;margin-top:8px;transition:all .2s}
-.m-submit:hover{filter:brightness(1.07)}
+.m-submit{width:100%;background:var(--green);border:none;color:#020902;padding:13px;border-radius:10px;font-size:14px;font-weight:700;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;cursor:pointer;margin-top:10px;transition:all .2s}
+.m-submit:hover{background:var(--green2);box-shadow:0 4px 20px rgba(77,255,124,.3)}
 
-@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-.hero-left>*{animation:fadeUp .5s ease both}
-.hero-pill{animation-delay:.05s}
-h1{animation-delay:.12s}
-.hero-p{animation-delay:.18s}
-.hero-trust{animation-delay:.22s}
-.hero-btns{animation-delay:.27s}
-.hero-right{animation:fadeUp .6s .35s ease both}
+/* ANIMS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
 
+<canvas id="bgCanvas"></canvas>
+
 <!-- NAV -->
 <nav>
-  <div class="n-logo"><div class="n-dot"></div>GlowingUp</div>
+  <a class="n-logo" href="index.html"><div class="n-dot"></div>GLOWINGUP</a>
   <ul class="n-links">
-    <li><a href="#services">Services</a></li>
-    <li><a href="#how">Comment ça marche</a></li>
-    <li><a href="#testi">Avis</a></li>
+    <li><a href="services.html">SERVICES</a></li>
+    <li><a href="#how">TUTORIEL</a></li>
+    <li><a href="#testi">AVIS</a></li>
     <li><a href="#faq">FAQ</a></li>
   </ul>
   <div class="n-right">
-    <button class="btn-login" onclick="openM('login')">Connexion</button>
-    <button class="btn-cta" onclick="openM('signup')">Inscription →</button>
+    <button class="btn-login" onclick="openM('login')">CONNEXION</button>
+    <button class="btn-cta" onclick="openM('signup')">INSCRIPTION →</button>
   </div>
 </nav>
 
 <!-- HERO -->
-<div style="max-width:1200px;margin:0 auto">
 <div class="hero">
-  <div class="hero-left">
-    <div class="hero-pill"><div class="hero-pill-dot"></div> Livraison instantanée garantie</div>
-    <h1>Booste tes réseaux en quelques <em>clics.</em></h1>
-    <p class="hero-p">La plateforme pour obtenir des followers, likes et vues sur Instagram, TikTok, YouTube et bien plus encore.</p>
-    <div class="hero-trust">
-      <div class="trust-chip">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-        100% sécurisé
-      </div>
-      <div class="trust-divider"></div>
-      <div class="trust-chip">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
-        Livraison rapide
-      </div>
-      <div class="trust-divider"></div>
-      <div class="trust-chip">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        Support 24/7
-      </div>
+  <div class="hero-badge"><div class="badge-dot"></div>Livraison instantanée garantie</div>
+  <div class="hero-title">
+    <span>BOOSTE</span>
+    <span class="line2">TES RÉSEAUX</span>
+    <span class="line3">EN QUELQUES CLICS</span>
+  </div>
+  <p class="hero-sub">La plateforme pour obtenir des followers, likes et vues sur Instagram, TikTok, YouTube et bien plus.</p>
+  <div class="hero-chips">
+    <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>100% sécurisé</div>
+    <div class="chip-sep"></div>
+    <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Livraison rapide</div>
+    <div class="chip-sep"></div>
+    <div class="chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Support 24/7</div>
+  </div>
+  <div class="hero-btns">
+    <button class="btn-hero-main" onclick="openM('signup')">COMMENCER MAINTENANT</button>
+    <button class="btn-hero-out" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">VOIR LES SERVICES</button>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-wrap">
+    <div class="stat-item">
+      <div class="stat-num"><span class="counter" data-target="150000" data-suffix="K+">0</span></div>
+      <div class="stat-lbl">Clients satisfaits</div>
     </div>
-    <div class="hero-btns">
-      <button class="btn-hero" onclick="openM('signup')">Commencer maintenant</button>
-      <button class="btn-hero-out" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">Voir les services</button>
+    <div class="stat-item">
+      <div class="stat-num"><span class="counter" data-target="2000000" data-suffix="M+">0</span></div>
+      <div class="stat-lbl">Commandes livrées</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num"><span class="counter" data-target="49" data-suffix="/5" data-decimal="1">0</span></div>
+      <div class="stat-lbl">Note moyenne</div>
+    </div>
+    <div class="stat-item">
+      <div class="stat-num"><span class="counter" data-target="180" data-suffix="+">0</span></div>
+      <div class="stat-lbl">Pays couverts</div>
     </div>
   </div>
-  <div class="hero-right">
-    <div class="h-card">
-      <div class="h-card-label">Vue d'ensemble</div>
-      <div class="h-stats">
-        <div class="h-stat-box"><div class="h-stat-num">150<span>K+</span></div><div class="h-stat-lbl">Clients satisfaits</div></div>
-        <div class="h-stat-box"><div class="h-stat-num">2<span>M+</span></div><div class="h-stat-lbl">Commandes livrées</div></div>
-        <div class="h-stat-box"><div class="h-stat-num">4.9<span>★</span></div><div class="h-stat-lbl">Note moyenne</div></div>
-        <div class="h-stat-box"><div class="h-stat-num">180<span>+</span></div><div class="h-stat-lbl">Pays couverts</div></div>
-      </div>
-    </div>
-    <div class="h-card">
-      <div class="h-card-label">Commandes récentes</div>
-      <div class="h-orders">
-        <div class="h-order">
-          <div class="h-order-icon">📸</div>
-          <div class="h-order-info"><div class="h-order-name">1 000 abonnés Instagram</div><div class="h-order-sub">Il y a 2 minutes</div></div>
-          <div class="h-order-badge">Livré ✓</div>
-        </div>
-        <div class="h-order">
-          <div class="h-order-icon">🎵</div>
-          <div class="h-order-info"><div class="h-order-name">500 likes TikTok</div><div class="h-order-sub">Il y a 5 minutes</div></div>
-          <div class="h-order-badge">Livré ✓</div>
-        </div>
-        <div class="h-order">
-          <div class="h-order-icon">▶️</div>
-          <div class="h-order-info"><div class="h-order-name">5 000 vues YouTube</div><div class="h-order-sub">Il y a 8 minutes</div></div>
-          <div class="h-order-badge pending">En cours…</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
 </div>
 
 <div class="divider"></div>
@@ -274,66 +250,67 @@ h1{animation-delay:.12s}
 <!-- PLATFORMS -->
 <div class="section">
   <div class="eyebrow">Plateformes</div>
-  <h2 class="sec-h2">Tous tes réseaux,<br>un seul endroit.</h2>
+  <h2 class="sec-h2">TOUS TES <em>RÉSEAUX</em></h2>
+  <p class="sec-p">Services disponibles sur les principales plateformes sociales mondiales.</p>
   <div class="plat-grid">
-    <div class="plat-card"><span class="plat-e">📸</span><div class="plat-n">Instagram</div><div class="plat-s">3 services</div></div>
-    <div class="plat-card"><span class="plat-e">🎵</span><div class="plat-n">TikTok</div><div class="plat-s">3 services</div></div>
-    <div class="plat-card"><span class="plat-e">▶️</span><div class="plat-n">YouTube</div><div class="plat-s">2 services</div></div>
-    <div class="plat-card"><span class="plat-e">𝕏</span><div class="plat-n">X / Twitter</div><div class="plat-s">2 services</div></div>
-    <div class="plat-card"><span class="plat-e">👥</span><div class="plat-n">Facebook</div><div class="plat-s">2 services</div></div>
-    <div class="plat-card"><span class="plat-e">✈️</span><div class="plat-n">Telegram</div><div class="plat-s">2 services</div></div>
+    <div class="plat-card"><span class="plat-e">📸</span><div class="plat-n">INSTAGRAM</div><div class="plat-s">3 services</div></div>
+    <div class="plat-card"><span class="plat-e">🎵</span><div class="plat-n">TIKTOK</div><div class="plat-s">3 services</div></div>
+    <div class="plat-card"><span class="plat-e">▶️</span><div class="plat-n">YOUTUBE</div><div class="plat-s">2 services</div></div>
+    <div class="plat-card"><span class="plat-e">𝕏</span><div class="plat-n">TWITTER</div><div class="plat-s">2 services</div></div>
+    <div class="plat-card"><span class="plat-e">👥</span><div class="plat-n">FACEBOOK</div><div class="plat-s">2 services</div></div>
+    <div class="plat-card"><span class="plat-e">✈️</span><div class="plat-n">TELEGRAM</div><div class="plat-s">2 services</div></div>
   </div>
 </div>
 
 <div class="divider"></div>
 
 <!-- SERVICES -->
-<div class="services-wrap" id="services">
+<div class="services-bg" id="services">
   <div class="section">
     <div class="svc-header">
       <div>
         <div class="eyebrow">Services populaires</div>
-        <h2 class="sec-h2">Choisis ton <em>boost.</em></h2>
+        <h2 class="sec-h2">CHOISIS TON <em>BOOST</em></h2>
       </div>
-      <button class="btn-sm-out">Voir tous les services →</button>
+      <a href="services.html"><button class="btn-outline">VOIR TOUT →</button></a>
     </div>
     <div class="svc-grid">
       <div class="svc featured">
-        <div class="svc-top-badge">⚡ Populaire</div>
+        <div class="svc-badge">⚡ POPULAIRE</div>
         <div class="svc-plat">Instagram</div>
-        <div class="svc-title">Abonnés Instagram</div>
+        <div class="svc-name">ABONNÉS INSTAGRAM</div>
         <div class="svc-desc">Followers réels et actifs. Livraison progressive et naturelle pour protéger ton compte.</div>
-        <div class="svc-foot"><div><div class="svc-price-big">0,79<span>€</span></div><div class="svc-price-sub">pour 100 abonnés</div></div><button class="btn-order" onclick="openM('signup')">Commander</button></div>
+        <div class="svc-foot"><div><div class="svc-price">1,98€</div><div class="svc-unit">pour 100 abonnés</div></div><button class="btn-order" onclick="openM('signup')">COMMANDER</button></div>
       </div>
       <div class="svc">
         <div class="svc-plat">Instagram</div>
-        <div class="svc-title">Likes Instagram</div>
+        <div class="svc-name">LIKES INSTAGRAM</div>
         <div class="svc-desc">Des likes instantanés sur tes photos et reels pour booster ta visibilité.</div>
-        <div class="svc-foot"><div><div class="svc-price-big">0,39<span>€</span></div><div class="svc-price-sub">pour 100 likes</div></div><button class="btn-order" onclick="openM('signup')">Commander</button></div>
+        <div class="svc-foot"><div><div class="svc-price">0,98€</div><div class="svc-unit">pour 100 likes</div></div><button class="btn-order" onclick="openM('signup')">COMMANDER</button></div>
       </div>
       <div class="svc">
         <div class="svc-plat">Instagram</div>
-        <div class="svc-title">Vues Reels</div>
+        <div class="svc-name">VUES REELS</div>
         <div class="svc-desc">Maximise la portée de tes Reels avec des vues de qualité certifiée.</div>
-        <div class="svc-foot"><div><div class="svc-price-big">0,19<span>€</span></div><div class="svc-price-sub">pour 1 000 vues</div></div><button class="btn-order" onclick="openM('signup')">Commander</button></div>
+        <div class="svc-foot"><div><div class="svc-price">0,48€</div><div class="svc-unit">pour 1 000 vues</div></div><button class="btn-order" onclick="openM('signup')">COMMANDER</button></div>
       </div>
       <div class="svc">
         <div class="svc-plat">TikTok</div>
-        <div class="svc-title">Followers TikTok</div>
+        <div class="svc-name">FOLLOWERS TIKTOK</div>
         <div class="svc-desc">Augmente ton audience TikTok avec des followers qui crédibilisent ton profil.</div>
-        <div class="svc-foot"><div><div class="svc-price-big">0,89<span>€</span></div><div class="svc-price-sub">pour 100 abonnés</div></div><button class="btn-order" onclick="openM('signup')">Commander</button></div>
+        <div class="svc-foot"><div><div class="svc-price">2,23€</div><div class="svc-unit">pour 100 abonnés</div></div><button class="btn-order" onclick="openM('signup')">COMMANDER</button></div>
       </div>
       <div class="svc">
         <div class="svc-plat">YouTube</div>
-        <div class="svc-title">Vues YouTube</div>
+        <div class="svc-name">VUES YOUTUBE</div>
         <div class="svc-desc">Propulse tes vidéos dans les recommandations grâce à des vues de qualité.</div>
-        <div class="svc-foot"><div><div class="svc-price-big">0,29<span>€</span></div><div class="svc-price-sub">pour 1 000 vues</div></div><button class="btn-order" onclick="openM('signup')">Commander</button></div>
+        <div class="svc-foot"><div><div class="svc-price">0,73€</div><div class="svc-unit">pour 1 000 vues</div></div><button class="btn-order" onclick="openM('signup')">COMMANDER</button></div>
       </div>
       <div class="svc">
         <div class="svc-plat">Instagram</div>
-        <div class="svc-title">Commentaires</div>
+        <div class="svc-name">COMMENTAIRES</div>
         <div class="svc-desc">Commentaires personnalisés et authentiques pour donner vie à tes publications.</div>
-        <div class="svc-foot"><div><div class="svc-price-big">1,49<span>€</span></div><div class="svc-price-sub">pour 10 commentaires</div></div><button class="btn-order" onclick="openM('signup')">Commander</button></div>
+        <div class="svc-foot"><div><div class="svc-price">3,73€</div><div class="svc-unit">pour 10 commentaires</div></div><button class="btn-order" onclick="openM('signup')">COMMANDER</button></div>
       </div>
     </div>
   </div>
@@ -344,27 +321,29 @@ h1{animation-delay:.12s}
 <!-- HOW -->
 <div class="section" id="how">
   <div class="eyebrow">Comment ça marche</div>
-  <h2 class="sec-h2">Simple comme bonjour.</h2>
+  <h2 class="sec-h2">SIMPLE COMME <em>BONJOUR</em></h2>
   <p class="sec-p">4 étapes pour booster ta présence en ligne en quelques minutes chrono.</p>
   <div class="steps">
-    <div class="step"><div class="step-n">01</div><div class="step-t">Crée ton compte</div><div class="step-d">Inscription gratuite en moins de 30 secondes.</div></div>
-    <div class="step"><div class="step-n">02</div><div class="step-t">Recharge ton solde</div><div class="step-d">CB, PayPal ou crypto — 100% sécurisé.</div></div>
-    <div class="step"><div class="step-n">03</div><div class="step-t">Passe commande</div><div class="step-d">Sélectionne le service et entre l'URL.</div></div>
-    <div class="step"><div class="step-n">04</div><div class="step-t">Profite des résultats</div><div class="step-d">Regarde ton audience grimper en quelques minutes.</div></div>
+    <div class="step"><div class="step-n">01</div><div class="step-t">CRÉE TON COMPTE</div><div class="step-d">Inscription gratuite en moins de 30 secondes.</div></div>
+    <div class="step"><div class="step-n">02</div><div class="step-t">RECHARGE TON SOLDE</div><div class="step-d">CB, PayPal ou crypto — 100% sécurisé.</div></div>
+    <div class="step"><div class="step-n">03</div><div class="step-t">PASSE COMMANDE</div><div class="step-d">Sélectionne le service et entre l'URL.</div></div>
+    <div class="step"><div class="step-n">04</div><div class="step-t">PROFITE DES RÉSULTATS</div><div class="step-d">Regarde ton audience grimper en quelques minutes.</div></div>
   </div>
 </div>
 
 <div class="divider"></div>
 
 <!-- FEATURES -->
-<div class="section">
-  <div class="eyebrow">Pourquoi GlowingUp</div>
-  <h2 class="sec-h2">Ce qui nous <em>différencie.</em></h2>
-  <div class="feat-grid">
-    <div class="feat"><div class="feat-icon">⚡</div><div class="feat-t">Livraison rapide</div><div class="feat-d">Les commandes démarrent en quelques minutes après paiement.</div></div>
-    <div class="feat"><div class="feat-icon">🔒</div><div class="feat-t">Zéro mot de passe</div><div class="feat-d">On n'a jamais besoin de tes identifiants. Ton compte reste le tien.</div></div>
-    <div class="feat"><div class="feat-icon">💚</div><div class="feat-t">Prix imbattables</div><div class="feat-d">Le meilleur rapport qualité-prix du marché, sans frais cachés.</div></div>
-    <div class="feat"><div class="feat-icon">🔄</div><div class="feat-t">Garantie de rétention</div><div class="feat-d">Si la livraison est incomplète, on rembourse automatiquement.</div></div>
+<div class="services-bg">
+  <div class="section">
+    <div class="eyebrow">Pourquoi GlowingUp</div>
+    <h2 class="sec-h2">CE QUI NOUS <em>DIFFÉRENCIE</em></h2>
+    <div class="feat-grid">
+      <div class="feat"><div class="feat-icon">⚡</div><div class="feat-t">LIVRAISON RAPIDE</div><div class="feat-d">Les commandes démarrent en quelques minutes après paiement.</div></div>
+      <div class="feat"><div class="feat-icon">🔒</div><div class="feat-t">ZÉRO MOT DE PASSE</div><div class="feat-d">On n'a jamais besoin de tes identifiants. Ton compte reste le tien.</div></div>
+      <div class="feat"><div class="feat-icon">💚</div><div class="feat-t">PRIX IMBATTABLES</div><div class="feat-d">Le meilleur rapport qualité-prix du marché, sans frais cachés.</div></div>
+      <div class="feat"><div class="feat-icon">🔄</div><div class="feat-t">GARANTIE RÉTENTION</div><div class="feat-d">Si la livraison est incomplète, on rembourse automatiquement.</div></div>
+    </div>
   </div>
 </div>
 
@@ -373,7 +352,7 @@ h1{animation-delay:.12s}
 <!-- TESTIMONIALS -->
 <div class="section" id="testi">
   <div class="eyebrow">Avis clients</div>
-  <h2 class="sec-h2">Ils ont transformé<br>leur présence.</h2>
+  <h2 class="sec-h2">ILS ONT <em>GLOWÉ</em></h2>
   <div class="testi-grid">
     <div class="testi">
       <div class="testi-stars">★★★★★</div>
@@ -398,45 +377,28 @@ h1{animation-delay:.12s}
 <!-- FAQ -->
 <div class="section-sm" id="faq">
   <div class="eyebrow">FAQ</div>
-  <h2 class="sec-h2">Tu as des questions ?</h2>
+  <h2 class="sec-h2">TES <em>QUESTIONS</em></h2>
   <div class="faq-list">
-    <div class="faq">
-      <div class="faq-q" onclick="tfaq(this)"><span class="faq-qt">Y a-t-il des risques pour mon compte ?</span><span class="faq-ic">+</span></div>
-      <div class="faq-a">Non, on ne demande jamais ton mot de passe. Nos méthodes sont conçues pour minimiser tout risque et rester dans les limites des plateformes.</div>
-    </div>
-    <div class="faq">
-      <div class="faq-q" onclick="tfaq(this)"><span class="faq-qt">Quand vais-je voir les résultats ?</span><span class="faq-ic">+</span></div>
-      <div class="faq-a">La plupart des commandes démarrent dans les 5 à 30 minutes. Le délai total dépend de la quantité commandée.</div>
-    </div>
-    <div class="faq">
-      <div class="faq-q" onclick="tfaq(this)"><span class="faq-qt">Quelles méthodes de paiement ?</span><span class="faq-ic">+</span></div>
-      <div class="faq-a">Visa, Mastercard, PayPal, Apple Pay et les principales cryptomonnaies (Bitcoin, USDT, Ethereum).</div>
-    </div>
-    <div class="faq">
-      <div class="faq-q" onclick="tfaq(this)"><span class="faq-qt">Et si des abonnés disparaissent après la commande ?</span><span class="faq-ic">+</span></div>
-      <div class="faq-a">Certains services incluent une garantie de rétention. Si des abonnés disparaissent dans la période de garantie, on les remet gratuitement.</div>
-    </div>
-    <div class="faq">
-      <div class="faq-q" onclick="tfaq(this)"><span class="faq-qt">Mon profil doit-il être public ?</span><span class="faq-ic">+</span></div>
-      <div class="faq-a">Oui, pour la livraison ton profil doit être en mode public. Tu peux le repasser en privé ensuite sans problème.</div>
-    </div>
+    <div class="faq"><div class="faq-q" onclick="tfaq(this)"><span class="faq-qt">Y a-t-il des risques pour mon compte ?</span><span class="faq-ic">+</span></div><div class="faq-a">Non, on ne demande jamais ton mot de passe. Nos méthodes sont conçues pour minimiser tout risque.</div></div>
+    <div class="faq"><div class="faq-q" onclick="tfaq(this)"><span class="faq-qt">Quand vais-je voir les résultats ?</span><span class="faq-ic">+</span></div><div class="faq-a">La plupart des commandes démarrent dans les 5 à 30 minutes après paiement.</div></div>
+    <div class="faq"><div class="faq-q" onclick="tfaq(this)"><span class="faq-qt">Quelles méthodes de paiement ?</span><span class="faq-ic">+</span></div><div class="faq-a">Visa, Mastercard, PayPal, Apple Pay et les principales cryptomonnaies (Bitcoin, USDT, Ethereum).</div></div>
+    <div class="faq"><div class="faq-q" onclick="tfaq(this)"><span class="faq-qt">Et si des abonnés disparaissent ?</span><span class="faq-ic">+</span></div><div class="faq-a">Certains services incluent une garantie de rétention. On remet les abonnés perdus gratuitement.</div></div>
+    <div class="faq"><div class="faq-q" onclick="tfaq(this)"><span class="faq-qt">Mon profil doit-il être public ?</span><span class="faq-ic">+</span></div><div class="faq-a">Oui, pour la livraison ton profil doit être en mode public. Tu peux le repasser en privé ensuite.</div></div>
   </div>
 </div>
 
 <!-- CTA -->
 <div class="cta-band">
-  <div class="eyebrow" style="justify-content:center">Prêt à commencer</div>
-  <h2 class="sec-h2" style="text-align:center;max-width:600px;margin:0 auto">Prêt à <em>glower</em> ?</h2>
-  <p>Rejoins des milliers d'utilisateurs qui ont transformé leur présence en ligne grâce à GlowingUp.</p>
-  <button class="btn-hero" onclick="openM('signup')">Créer mon compte gratuitement →</button>
+  <div class="cta-glow"></div>
+  <h2>PRÊT À <span>GLOWER</span> ?</h2>
+  <p>Rejoins des milliers d'utilisateurs qui ont transformé leur présence en ligne.</p>
+  <button class="btn-hero-main" onclick="openM('signup')">CRÉER MON COMPTE GRATUITEMENT →</button>
 </div>
 
 <!-- FOOTER -->
 <footer>
-  <div class="f-logo"><div class="n-dot"></div>GlowingUp</div>
-  <div class="f-links">
-    <a href="#">CGU</a><a href="#">Confidentialité</a><a href="#">Mentions légales</a><a href="#">Contact</a>
-  </div>
+  <div class="f-logo"><div class="n-dot"></div>GLOWINGUP</div>
+  <div class="f-links"><a href="#">CGU</a><a href="#">Confidentialité</a><a href="#">Mentions légales</a><a href="#">Contact</a></div>
   <div class="f-copy">© 2026 GlowingUp — Tous droits réservés</div>
 </footer>
 
@@ -444,29 +406,133 @@ h1{animation-delay:.12s}
 <div class="overlay" id="ov" onclick="closeOut(event)">
   <div class="modal">
     <button class="m-close" onclick="closeM()">×</button>
-    <div class="m-logo"><div class="m-logo-dot"></div>GlowingUp</div>
-    <div class="m-h" id="mh">Bon retour 👋</div>
+    <div class="m-logo"><div class="m-logo-dot"></div>GLOWINGUP</div>
+    <div class="m-h" id="mh">BON RETOUR</div>
     <div class="m-sub" id="ms">Connecte-toi à ton compte</div>
     <div class="m-tabs">
-      <button class="m-tab on" id="tl" onclick="sw('login')">Connexion</button>
-      <button class="m-tab" id="ts" onclick="sw('signup')">Inscription</button>
+      <button class="m-tab on" id="tl" onclick="sw('login')">CONNEXION</button>
+      <button class="m-tab" id="ts" onclick="sw('signup')">INSCRIPTION</button>
     </div>
     <div id="fl">
       <div class="fg"><label class="fl">Email</label><input type="email" class="fi" placeholder="toi@exemple.com"></div>
       <div class="fg"><label class="fl">Mot de passe</label><input type="password" class="fi" placeholder="••••••••"></div>
-      <button class="m-submit">Se connecter →</button>
-      <p style="text-align:center;margin-top:13px;font-size:12px;color:var(--text3)"><a href="#" style="color:var(--green);text-decoration:none">Mot de passe oublié ?</a></p>
+      <button class="m-submit">SE CONNECTER →</button>
+      <p style="text-align:center;margin-top:14px;font-size:12px;color:var(--text3)"><a href="#" style="color:var(--green);text-decoration:none">Mot de passe oublié ?</a></p>
     </div>
     <div id="fs" style="display:none">
       <div class="fg"><label class="fl">Prénom</label><input type="text" class="fi" placeholder="Ton prénom"></div>
       <div class="fg"><label class="fl">Email</label><input type="email" class="fi" placeholder="toi@exemple.com"></div>
       <div class="fg"><label class="fl">Mot de passe</label><input type="password" class="fi" placeholder="Min. 8 caractères"></div>
-      <button class="m-submit">Créer mon compte →</button>
+      <button class="m-submit">CRÉER MON COMPTE →</button>
     </div>
   </div>
 </div>
 
 <script>
+/* ── CANVAS PARTICLES ── */
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+
+function resize(){
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener('resize', resize);
+
+class Particle {
+  constructor(){this.reset()}
+  reset(){
+    this.x = Math.random()*W;
+    this.y = Math.random()*H;
+    this.size = Math.random()*1.5+.3;
+    this.speedX = (Math.random()-.5)*.3;
+    this.speedY = (Math.random()-.5)*.3;
+    this.opacity = Math.random()*.6+.1;
+    this.pulse = Math.random()*Math.PI*2;
+  }
+  update(){
+    this.x += this.speedX;
+    this.y += this.speedY;
+    this.pulse += .02;
+    this.opacity = (.3+Math.sin(this.pulse)*.25);
+    if(this.x<0||this.x>W||this.y<0||this.y>H) this.reset();
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+    ctx.fillStyle = `rgba(77,255,124,${this.opacity})`;
+    ctx.fill();
+  }
+}
+
+for(let i=0;i<120;i++) particles.push(new Particle());
+
+/* Grid lines */
+function drawGrid(){
+  ctx.clearRect(0,0,W,H);
+  ctx.strokeStyle = 'rgba(77,255,124,0.03)';
+  ctx.lineWidth = 1;
+  const gs = 80;
+  for(let x=0;x<W;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+  for(let y=0;y<H;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+}
+
+function animate(){
+  drawGrid();
+  particles.forEach(p=>{p.update();p.draw()});
+  // connections
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<100){
+        ctx.beginPath();
+        ctx.strokeStyle=`rgba(77,255,124,${.06*(1-dist/100)})`;
+        ctx.lineWidth=.5;
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+  requestAnimationFrame(animate);
+}
+animate();
+
+/* ── COUNTERS ── */
+function animateCounters(){
+  document.querySelectorAll('.counter').forEach(el=>{
+    const target = parseInt(el.dataset.target);
+    const suffix = el.dataset.suffix||'';
+    const decimal = el.dataset.decimal;
+    const duration = 2000;
+    const step = target/duration*16;
+    let current = 0;
+    const timer = setInterval(()=>{
+      current += step;
+      if(current>=target){current=target;clearInterval(timer)}
+      let display;
+      if(target>=1000000) display = (current/1000000).toFixed(1);
+      else if(target>=1000) display = Math.round(current/1000);
+      else if(decimal) display = (current/10).toFixed(1);
+      else display = Math.round(current);
+      el.textContent = display + suffix;
+    },16);
+  });
+}
+
+/* Intersection Observer for counters */
+const statsWrap = document.querySelector('.stats-wrap');
+if(statsWrap){
+  const obs = new IntersectionObserver(entries=>{
+    if(entries[0].isIntersecting){animateCounters();obs.disconnect()}
+  },{threshold:.3});
+  obs.observe(statsWrap);
+}
+
+/* ── MODAL ── */
 function openM(t){document.getElementById('ov').classList.add('on');sw(t||'login')}
 function closeM(){document.getElementById('ov').classList.remove('on')}
 function closeOut(e){if(e.target===document.getElementById('ov'))closeM()}
@@ -475,7 +541,7 @@ function sw(t){
   document.getElementById('fs').style.display=t==='signup'?'block':'none';
   document.getElementById('tl').className='m-tab'+(t==='login'?' on':'');
   document.getElementById('ts').className='m-tab'+(t==='signup'?' on':'');
-  document.getElementById('mh').textContent=t==='login'?'Bon retour 👋':'Rejoins-nous ✦';
+  document.getElementById('mh').textContent=t==='login'?'BON RETOUR 👋':'REJOINS-NOUS ✦';
   document.getElementById('ms').textContent=t==='login'?'Connecte-toi à ton compte':'Inscription gratuite en 30 secondes';
 }
 function tfaq(el){el.parentElement.classList.toggle('open')}
