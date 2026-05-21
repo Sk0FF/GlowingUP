@@ -210,6 +210,11 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle}
         </div>
         <div style="display:flex;gap:32px;flex-wrap:wrap">
           <div style="text-align:center">
+            <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Bénéfice net</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:#00ffcc;letter-spacing:1px;text-shadow:0 0 20px rgba(0,255,200,.3)" id="big-profit">0,00€</div>
+            <div style="font-size:10px;color:var(--text3);margin-top:2px">60% du CA</div>
+          </div>
+          <div style="text-align:center">
             <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Commandes</div>
             <div style="font-family:'Bebas Neue',sans-serif;font-size:32px;color:var(--white);letter-spacing:1px" id="big-orders">0</div>
           </div>
@@ -230,6 +235,11 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle}
 
       <!-- MINI STAT CARDS -->
       <div class="stats-row" style="margin-bottom:24px">
+        <div class="stat-card" style="border-color:rgba(0,255,200,.2)">
+          <div class="stat-label">Bénéfice net</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:#00ffcc;letter-spacing:2px;line-height:1;margin-top:6px;text-shadow:0 0 20px rgba(0,255,200,.25)" id="stat-profit">—</div>
+          <div class="stat-sub">60% du CA encaissé</div>
+        </div>
         <div class="stat-card">
           <div class="stat-label">Panier moyen</div>
           <div class="stat-value green" id="stat-avg">—</div>
@@ -244,11 +254,6 @@ td{padding:13px 16px;font-size:13px;vertical-align:middle}
           <div class="stat-label">Taux de livraison</div>
           <div class="stat-value green" id="stat-rate">—</div>
           <div class="stat-sub">Commandes livrées</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Total all-time</div>
-          <div class="stat-value green" id="stat-alltime">—</div>
-          <div class="stat-sub">Depuis le début</div>
         </div>
       </div>
 
@@ -487,6 +492,7 @@ function updatePeriodStats(){
   }
 
   const revenue = filtered.reduce((s,o) => s + parseFloat(o.amount||0), 0);
+  const profit = revenue * 0.6;
   const pending = filtered.filter(o=>o.status==='pending').length;
   const delivered = filtered.filter(o=>o.status==='delivered').length;
   const cancelled = filtered.filter(o=>o.status==='cancelled').length;
@@ -499,11 +505,13 @@ function updatePeriodStats(){
   const topSvc = Object.entries(svcCount).sort((a,b)=>b[1]-a[1])[0];
 
   document.getElementById('big-revenue').textContent = revenue.toFixed(2)+'€';
+  document.getElementById('big-profit').textContent = profit.toFixed(2)+'€';
   document.getElementById('big-period-label').textContent = label;
   document.getElementById('big-orders').textContent = filtered.length;
   document.getElementById('big-pending').textContent = pending;
   document.getElementById('big-delivered').textContent = delivered;
   document.getElementById('big-cancelled').textContent = cancelled;
+  document.getElementById('stat-profit').textContent = profit.toFixed(2)+'€';
   document.getElementById('stat-avg').textContent = avg+'€';
   document.getElementById('stat-top').textContent = topSvc ? topSvc[0] : '—';
   document.getElementById('stat-rate').textContent = rate+'%';
