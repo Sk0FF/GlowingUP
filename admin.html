@@ -1171,14 +1171,19 @@ async function loadPayments(){
 /* ── SOUND NOTIFICATIONS ── */
 let lastOrderCount = null;
 let soundEnabled = true;
+let audioCtx = null;
+
+function getAudioCtx(){
+  if(!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if(audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
 
 function playNotifSound(){
   if(!soundEnabled) return;
   try {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    
-    // Jingle : 3 notes ascendantes
-    const notes = [523.25, 659.25, 783.99]; // Do, Mi, Sol
+    const ctx = getAudioCtx();
+    const notes = [523.25, 659.25, 783.99];
     notes.forEach((freq, i) => {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
@@ -1187,13 +1192,16 @@ function playNotifSound(){
       osc.type = 'sine';
       osc.frequency.value = freq;
       gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.15);
-      gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + i * 0.15 + 0.05);
-      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + i * 0.15 + 0.2);
+      gain.gain.linearRampToValueAtTime(0.4, ctx.currentTime + i * 0.15 + 0.05);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + i * 0.15 + 0.25);
       osc.start(ctx.currentTime + i * 0.15);
-      osc.stop(ctx.currentTime + i * 0.15 + 0.25);
+      osc.stop(ctx.currentTime + i * 0.15 + 0.3);
     });
   } catch(e) { console.log('Sound error:', e); }
 }
+
+// Unlock audio on first user interaction
+document.addEventListener('click', () => { getAudioCtx(); }, { once: true });
 
 function checkNewOrders(orders){
   if(lastOrderCount === null){ lastOrderCount = orders.length; return; }
@@ -1214,6 +1222,7 @@ function toggleSound(){
     btn.title = soundEnabled ? 'Son activé — cliquer pour désactiver' : 'Son désactivé — cliquer pour activer';
     btn.style.opacity = soundEnabled ? '1' : '0.4';
   }
+  if(soundEnabled) playNotifSound(); // test sound on enable
   showToast(soundEnabled ? '🔔 Son activé' : '🔕 Son désactivé');
 }
 
