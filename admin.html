@@ -176,6 +176,10 @@ tbody tr:hover td{color:var(--text)}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
       Trafic
     </div>
+    <div class="nav-item" onclick="showPage('payments')" id="nav-payments">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+      Paiements
+    </div>
     <div class="sidebar-bottom">
       <button class="btn-logout" onclick="logout()">Se déconnecter</button>
     </div>
@@ -416,6 +420,24 @@ tbody tr:hover td{color:var(--text)}
       </div>
     </div>
 
+    <!-- PAYMENTS -->
+    <div class="page" id="page-payments" style="display:none">
+      <div class="page-title">PAIEMENTS</div>
+      <div class="page-sub">Historique complet des paiements Stripe</div>
+      <div class="stats-row" style="margin-bottom:24px">
+        <div class="stat-card"><div class="stat-label">Total encaissé</div><div class="stat-value green" id="pay-total">—</div><div class="stat-sub">Paiements réussis</div></div>
+        <div class="stat-card"><div class="stat-label">Nb paiements</div><div class="stat-value" id="pay-count">—</div><div class="stat-sub">50 derniers</div></div>
+        <div class="stat-card"><div class="stat-label">Panier moyen</div><div class="stat-value green" id="pay-avg">—</div><div class="stat-sub">Par paiement</div></div>
+        <div class="stat-card"><div class="stat-label">En attente</div><div class="stat-value" id="pay-pending">—</div><div class="stat-sub">Non finalisés</div></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID Stripe</th><th>Montant</th><th>Service</th><th>Email</th><th>Date</th><th>Statut</th><th>Reçu</th></tr></thead>
+          <tbody id="paymentsTable"><tr><td colspan="7"><div class="empty"><div class="empty-icon">💳</div><div class="empty-text">Chargement...</div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -546,6 +568,7 @@ function showPage(page){
   if(page==='analyse') setTimeout(renderAnalyse, 100);
   if(page==='promos') loadPromos();
   if(page==='clients') loadClients();
+  if(page==='payments') loadPayments();
 }
 
 async function loadOrders(){
@@ -1109,6 +1132,39 @@ function showDashboard(){
   loadOrders();
   loadStats();
   setTimeout(animateCards,300); 
+}
+
+/* ── PAYMENTS ── */
+async function loadPayments(){
+  try {
+    const res = await fetch(`${API}/api/admin/payments`,{headers:{'Authorization':'Bearer '+token}});
+    const payments = await res.json();
+
+    const succeeded = payments.filter(p=>p.status==='succeeded');
+    const total = succeeded.reduce((s,p)=>s+p.amount,0);
+    const avg = succeeded.length ? (total/succeeded.length).toFixed(2) : '0.00';
+    const pending = payments.filter(p=>p.status!=='succeeded').length;
+
+    document.getElementById('pay-total').textContent = total.toFixed(2)+'€';
+    document.getElementById('pay-count').textContent = succeeded.length;
+    document.getElementById('pay-avg').textContent = avg+'€';
+    document.getElementById('pay-pending').textContent = pending;
+
+    const statusMap = {succeeded:'Réussi', pending:'En attente', canceled:'Annulé', requires_payment_method:'Échoué'};
+    const statusClass = {succeeded:'status-delivered', pending:'status-pending', canceled:'status-cancelled', requires_payment_method:'status-cancelled'};
+
+    document.getElementById('paymentsTable').innerHTML = payments.length ? payments.map(p=>`
+      <tr>
+        <td class="td-id" style="font-size:10px;color:var(--text3)">${p.id.substring(0,20)}...</td>
+        <td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--green)">${p.amount.toFixed(2)}€</span></td>
+        <td class="td-service" style="font-size:12px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.description}</td>
+        <td class="td-link">${p.email}</td>
+        <td class="td-date">${new Date(p.created).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</td>
+        <td><span class="status-badge ${statusClass[p.status]||'status-pending'}">${statusMap[p.status]||p.status}</span></td>
+        <td>${p.receipt_url ? `<a href="${p.receipt_url}" target="_blank" style="color:var(--green);font-size:12px;text-decoration:none;border:1px solid var(--green-border);padding:4px 10px;border-radius:6px;transition:all .2s" onmouseover="this.style.background='var(--green-dim)'" onmouseout="this.style.background='none'">Voir →</a>` : '<span style="color:var(--text3);font-size:11px">—</span>'}</td>
+      </tr>
+    `).join('') : '<tr><td colspan="7"><div class="empty"><div class="empty-icon">💳</div><div class="empty-text">Aucun paiement</div></div></td></tr>';
+  } catch(e){ showToast('Erreur chargement paiements'); }
 }
 
 // Auto refresh every 30s
