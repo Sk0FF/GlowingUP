@@ -204,7 +204,7 @@ tbody tr:hover td{color:var(--text)}
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>ID</th><th>Service</th><th>Lien</th><th>Qté</th><th>Montant</th><th>Promo</th><th>Email</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
+          <thead><tr><th>ID</th><th>Service</th><th>ID Service</th><th>Lien</th><th>Qté</th><th>Montant</th><th>Bénéfice</th><th>Promo</th><th>Email</th><th>Date</th><th>Statut</th><th>Actions</th></tr></thead>
           <tbody id="ordersTable"><tr><td colspan="10"><div class="empty"><div class="empty-icon">📦</div><div class="empty-text">Chargement...</div></div></td></tr></tbody>
         </table>
       </div>
@@ -756,17 +756,25 @@ function updateChart(orders, period){
 function renderOrders(orders){
   const tbody = document.getElementById('ordersTable');
   if(!orders.length){
-    tbody.innerHTML='<tr><td colspan="10"><div class="empty"><div class="empty-icon">📦</div><div class="empty-text">Aucune commande pour le moment</div></div></td></tr>';
+    tbody.innerHTML='<tr><td colspan="12"><div class="empty"><div class="empty-icon">📦</div><div class="empty-text">Aucune commande pour le moment</div></div></td></tr>';
     return;
   }
-  tbody.innerHTML = orders.map(o=>`
+  tbody.innerHTML = orders.map(o=>{
+    const amount = parseFloat(o.amount||0);
+    // Coût fournisseur = montant / 2.5, bénéfice = montant - coût fournisseur
+    const profit = (amount - amount / 2.5).toFixed(2);
+    const svcId = o.id_service || '—';
+    return `
     <tr id="row-${o.id}">
       <td class="td-id">#${o.id}</td>
       <td><div class="td-service">${o.service}</div><div style="font-size:10px;color:var(--text3)">${o.platform}</div></td>
+      <td><span style="font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;background:rgba(77,150,255,.1);color:#4d96ff;border:1px solid rgba(77,150,255,.2);padding:2px 8px;border-radius:6px">#${svcId}</span></td>
       <td class="td-link" title="${o.link}">${o.link}</td>
       <td>${o.quantity?.toLocaleString()}</td>
-      <td class="td-amount">
-        ${parseFloat(o.amount).toFixed(2)}€
+      <td class="td-amount">${amount.toFixed(2)}€</td>
+      <td>
+        <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;color:#00ffcc;letter-spacing:1px" title="Bénéfice net (prix vente - coût fournisseur)">${profit}€</span>
+        ${o.promo_code ? `<div style="font-size:9px;color:var(--text3)">avec promo</div>` : ''}
       </td>
       <td>${o.promo_code ? `<span style="font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:1px;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border);padding:2px 8px;border-radius:100px">${o.promo_code}</span>` : '<span style="color:var(--text3);font-size:11px">—</span>'}</td>
       <td class="td-link">${o.email||'—'}</td>
@@ -782,7 +790,7 @@ function renderOrders(orders){
         <button class="btn-delete" onclick="deleteOrder(${o.id})">🗑</button>
       </td>
     </tr>
-  `).join('');
+  `}).join('');
 }
 
 function statusLabel(s){
