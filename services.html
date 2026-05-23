@@ -757,7 +757,9 @@ function openOrder(name, plat, price, min, max, svcId){
   document.getElementById('m-svc-plat').textContent = plat;
   document.getElementById('m-price').textContent = price + ' €';
   document.getElementById('m-minmax').textContent = min + ' — ' + max;
-  document.getElementById('m-email').value = '';
+  // Auto-fill email if logged in
+  const _ud = JSON.parse(localStorage.getItem('user_data') || 'null');
+  document.getElementById('m-email').value = _ud ? _ud.email : '';
   document.getElementById('m-link').value = '';
   document.getElementById('m-qty').value = '';
   document.getElementById('m-promo').value = '';
@@ -838,6 +840,13 @@ async function submitOrder(){
 
   if(finalAmount < 0.5){ alert('Le montant minimum est de 0,50€'); return; }
 
+  // Get user_id if logged in
+  const userData = JSON.parse(localStorage.getItem('user_data') || 'null');
+  const userId = userData?.id || null;
+
+  // Auto-fill email if logged in
+  if(userData && !email) document.getElementById('m-email').value = userData.email;
+
   const btn = document.getElementById('m-submit-btn');
   btn.textContent = 'Redirection...';
   btn.disabled = true;
@@ -855,7 +864,8 @@ async function submitOrder(){
         email,
         promo_code: appliedCode || null,
         original_amount: originalAmount,
-        id_service: currentServiceId
+        id_service: currentServiceId,
+        user_id: userId
       })
     });
     const data = await res.json();
