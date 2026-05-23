@@ -1167,6 +1167,74 @@ async function loadPayments(){
   } catch(e){ showToast('Erreur chargement paiements'); }
 }
 
+
+/* ── SOUND NOTIFICATIONS ── */
+let lastOrderCount = null;
+let soundEnabled = true;
+
+function playNotifSound(){
+  if(!soundEnabled) return;
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    // Jingle : 3 notes ascendantes
+    const notes = [523.25, 659.25, 783.99]; // Do, Mi, Sol
+    notes.forEach((freq, i) => {
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'sine';
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(0, ctx.currentTime + i * 0.15);
+      gain.gain.linearRampToValueAtTime(0.3, ctx.currentTime + i * 0.15 + 0.05);
+      gain.gain.linearRampToValueAtTime(0, ctx.currentTime + i * 0.15 + 0.2);
+      osc.start(ctx.currentTime + i * 0.15);
+      osc.stop(ctx.currentTime + i * 0.15 + 0.25);
+    });
+  } catch(e) { console.log('Sound error:', e); }
+}
+
+function checkNewOrders(orders){
+  if(lastOrderCount === null){ lastOrderCount = orders.length; return; }
+  if(orders.length > lastOrderCount){
+    const newCount = orders.length - lastOrderCount;
+    playNotifSound();
+    showToast(`🛒 ${newCount} nouvelle${newCount>1?'s':''} commande${newCount>1?'s':''}  !`);
+    lastOrderCount = orders.length;
+  }
+}
+
+// Toggle son button
+function toggleSound(){
+  soundEnabled = !soundEnabled;
+  const btn = document.getElementById('sound-btn');
+  if(btn){
+    btn.textContent = soundEnabled ? '🔔' : '🔕';
+    btn.title = soundEnabled ? 'Son activé — cliquer pour désactiver' : 'Son désactivé — cliquer pour activer';
+    btn.style.opacity = soundEnabled ? '1' : '0.4';
+  }
+  showToast(soundEnabled ? '🔔 Son activé' : '🔕 Son désactivé');
+}
+
+// Add sound button to sidebar after logo
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const logo = document.querySelector('.sidebar-logo');
+    if(logo){
+      const btn = document.createElement('button');
+      btn.id = 'sound-btn';
+      btn.textContent = '🔔';
+      btn.title = 'Son activé — cliquer pour désactiver';
+      btn.onclick = toggleSound;
+      btn.style.cssText = 'position:absolute;top:20px;right:16px;background:none;border:1px solid var(--line);border-radius:8px;color:var(--text2);cursor:pointer;font-size:14px;padding:5px 8px;transition:all .2s;z-index:10';
+      btn.onmouseover = ()=>btn.style.borderColor='var(--green-border)';
+      btn.onmouseout = ()=>btn.style.borderColor='var(--line)';
+      document.querySelector('.sidebar').appendChild(btn);
+    }
+  }, 500);
+});
+
 // Auto refresh every 30s
 setInterval(()=>{ if(token){ loadOrders(); loadStats(); } }, 30000);
 </script>
