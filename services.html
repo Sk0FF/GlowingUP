@@ -32,6 +32,11 @@ nav{position:fixed;inset:0 0 auto;z-index:200;display:flex;align-items:center;ju
 .n-links a{color:var(--text3);text-decoration:none;font-size:13px;font-weight:500;transition:color .18s}
 .n-links a:hover,.n-links a.active{color:var(--text)}
 .n-right{display:flex;gap:8px;align-items:center}
+.nav-user-name{font-size:13px;color:var(--text2);font-weight:500}
+.btn-compte{border:1px solid var(--green-border);background:var(--green-dim);color:var(--green);padding:7px 16px;border-radius:8px;font-size:12px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;cursor:pointer;transition:all .2s}
+.btn-compte:hover{background:var(--green);color:#020902}
+.btn-logout-nav{border:1px solid var(--line);background:none;color:var(--text3);padding:7px 14px;border-radius:8px;font-size:12px;cursor:pointer;transition:all .2s}
+.btn-logout-nav:hover{color:#ff4d4d}
 .btn-login{border:1px solid var(--line2);background:none;color:var(--text2);padding:7px 18px;border-radius:7px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .18s}
 .btn-login:hover{border-color:var(--green-border);color:var(--green)}
 .btn-cta{background:var(--green);border:none;color:#040a05;padding:8px 20px;border-radius:7px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:600;cursor:pointer;transition:all .2s}
@@ -178,7 +183,7 @@ nav{position:fixed;inset:0 0 auto;z-index:200;display:flex;align-items:center;ju
     <li><a href="index.html#how">Comment ça marche</a></li>
     <li><a href="index.html#faq">FAQ</a></li>
   </ul>
-  <div class="n-right">
+  <div class="n-right" id="nav-right">
     <button class="btn-login" onclick="window.location.href='login.html'">Connexion</button>
     <button class="btn-cta" onclick="window.location.href='login.html'">Inscription →</button>
   </div>

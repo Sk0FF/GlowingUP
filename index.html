@@ -36,7 +36,15 @@ nav{position:fixed;inset:0 0 auto;z-index:200;display:flex;align-items:center;ju
 .n-links{display:flex;gap:32px;list-style:none}
 .n-links a{color:var(--text3);text-decoration:none;font-size:13px;font-weight:500;transition:color .2s;letter-spacing:.5px;text-transform:uppercase}
 .n-links a:hover,.n-links a.active{color:var(--text)}
-.n-right{display:flex;gap:10px}
+.n-right{display:flex;gap:10px;align-items:center}
+.nav-user-avatar{width:32px;height:32px;border-radius:50%;background:var(--green-dim);border:1px solid var(--green-border);display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:13px;color:var(--green);cursor:pointer;transition:all .2s;flex-shrink:0}
+.nav-user-avatar:hover{background:var(--green);color:#020902}
+.nav-user-name{font-size:13px;color:var(--text2);font-weight:500}
+.nav-user-menu{display:flex;gap:8px;align-items:center}
+.btn-compte{border:1px solid var(--green-border);background:var(--green-dim);color:var(--green);padding:7px 16px;border-radius:8px;font-size:12px;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;cursor:pointer;transition:all .2s}
+.btn-compte:hover{background:var(--green);color:#020902}
+.btn-logout-nav{border:1px solid var(--line);background:none;color:var(--text3);padding:7px 14px;border-radius:8px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;transition:all .2s}
+.btn-logout-nav:hover{border-color:rgba(255,77,77,.3);color:#ff4d4d}
 .btn-login{border:1px solid var(--line2);background:none;color:var(--text2);padding:8px 20px;border-radius:8px;font-size:13px;font-family:'DM Sans',sans-serif;font-weight:500;cursor:pointer;transition:all .2s;letter-spacing:.3px}
 .btn-login:hover{border-color:var(--green-border);color:var(--green)}
 .btn-cta{background:var(--green);border:none;color:#020902;padding:9px 22px;border-radius:8px;font-size:13px;font-family:'Bebas Neue',sans-serif;font-weight:400;cursor:pointer;transition:all .2s;letter-spacing:2px}
@@ -238,7 +246,7 @@ footer{position:relative;z-index:1;padding:36px 56px;display:flex;justify-conten
     <li><a href="#testi">AVIS</a></li>
     <li><a href="#faq">FAQ</a></li>
   </ul>
-  <div class="n-right">
+  <div class="n-right" id="nav-right">
     <button class="btn-login" onclick="window.location.href='login.html'">CONNEXION</button>
     <button class="btn-cta" onclick="window.location.href='login.html'">INSCRIPTION →</button>
   </div>
@@ -570,6 +578,29 @@ function sw(t){
   document.getElementById('ms').textContent=t==='login'?'Connecte-toi à ton compte':'Inscription gratuite en 30 secondes';
 }
 function tfaq(el){el.parentElement.classList.toggle('open')}
+
+/* ── NAV LOGIN STATE ── */
+(function(){
+  const token = localStorage.getItem('user_token');
+  const userData = JSON.parse(localStorage.getItem('user_data') || 'null');
+  const navRight = document.getElementById('nav-right');
+  if(!navRight) return;
+
+  if(token && userData){
+    const initials = userData.name?.split(' ').map(w=>w[0]).join('').toUpperCase().substring(0,2) || '?';
+    navRight.innerHTML = `
+      <span class="nav-user-name">Bonjour, <strong style="color:var(--white)">${userData.name?.split(' ')[0]}</strong> 👋</span>
+      <button class="btn-compte" onclick="window.location.href='compte.html'">MON COMPTE</button>
+      <button class="btn-logout-nav" onclick="logoutNav()">Déconnexion</button>
+    `;
+  }
+})();
+
+function logoutNav(){
+  localStorage.removeItem('user_token');
+  localStorage.removeItem('user_data');
+  window.location.reload();
+}
 
 /* ── FAKE PURCHASE NOTIFICATIONS ── */
 const notifStyle = document.createElement('style');
