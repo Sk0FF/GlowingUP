@@ -1091,11 +1091,25 @@ function animateCards(){ document.querySelectorAll('.stat-card').forEach((el,i)=
 /* ── OVERRIDE showPage ── */
 const _origShowPage = showPage;
 function showPage(page){
-  _origShowPage(page);
+  document.querySelectorAll('.page').forEach(p=>{ p.classList.remove('active'); p.style.display='none'; });
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const pageEl = document.getElementById('page-'+page);
+  if(pageEl){ pageEl.classList.add('active'); pageEl.style.display='block'; }
+  const navEl = document.getElementById('nav-'+page);
+  if(navEl) navEl.classList.add('active');
+  if(page==='analyse') setTimeout(renderAnalyse, 100);
+  if(page==='promos') loadPromos();
+  if(page==='clients') loadClients();
   setTimeout(()=>{ typeTitle(document.querySelector('#page-'+page+' .page-title')); animateCards(); },50);
 }
 const _origShowDash = showDashboard;
-function showDashboard(){ _origShowDash(); setTimeout(animateCards,300); }
+function showDashboard(){ 
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('dashboard').style.display='block';
+  loadOrders();
+  loadStats();
+  setTimeout(animateCards,300); 
+}
 
 // Auto refresh every 30s
 setInterval(()=>{ if(token){ loadOrders(); loadStats(); } }, 30000);
