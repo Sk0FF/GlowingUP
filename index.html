@@ -599,31 +599,50 @@ notifStyle.textContent = `
 `;
 document.head.appendChild(notifStyle);
 
-const notifData = [
-  {name:'Lucas M.', flag:'🇫🇷', service:'1 000 abonnés Instagram', icon:'📸', price:'9,75€'},
-  {name:'Sarah K.', flag:'🇧🇪', service:'500 likes TikTok', icon:'🎵', price:'4,00€'},
-  {name:'Thomas R.', flag:'🇨🇭', service:'5 000 vues Reels', icon:'▶️', price:'0,95€'},
-  {name:'Emma D.', flag:'🇫🇷', service:'2 000 followers TikTok', icon:'🎵', price:'17,80€'},
-  {name:'Hugo B.', flag:'🇫🇷', service:'10 000 vues YouTube', icon:'▶️', price:'2,90€'},
-  {name:'Léa V.', flag:'🇧🇪', service:'1 000 likes Instagram', icon:'❤️', price:'3,90€'},
-  {name:'Nathan P.', flag:'🇫🇷', service:'500 abonnés Instagram', icon:'📸', price:'4,88€'},
-  {name:'Jade M.', flag:'🇨🇭', service:'3 000 vues Reels', icon:'▶️', price:'0,57€'},
-  {name:'Rayan A.', flag:'🇫🇷', service:'1 000 followers TikTok', icon:'🎵', price:'8,90€'},
-  {name:'Inès L.', flag:'🇫🇷', service:'500 likes TikTok', icon:'❤️', price:'4,00€'},
-  {name:'Mathis C.', flag:'🇧🇪', service:'2 000 abonnés YouTube', icon:'▶️', price:'12,00€'},
-  {name:'Zoé T.', flag:'🇫🇷', service:'10 commentaires Instagram', icon:'💬', price:'14,90€'},
+const firstNames = ['Lucas','Sarah','Thomas','Emma','Hugo','Léa','Nathan','Jade','Rayan','Inès','Mathis','Zoé','Maxime','Camille','Antoine','Manon','Théo','Chloé','Enzo','Lisa','Baptiste','Lucie','Axel','Clara','Noé','Eva','Louis','Mia','Ethan','Ambre','Luca','Océane','Timéo','Alicia','Nolan','Laura','Yanis','Pauline','Tom','Elisa'];
+const lastInits = ['M.','K.','R.','D.','B.','V.','P.','T.','A.','L.','C.','G.','F.','H.','S.','N.','J.','W.','X.','Z.'];
+const flags = ['🇫🇷','🇫🇷','🇫🇷','🇧🇪','🇨🇭','🇫🇷','🇫🇷','🇲🇦','🇩🇿','🇫🇷','🇷🇪'];
+
+const services = [
+  {service:'500 abonnés Instagram', icon:'📸', price:'4,88€'},
+  {service:'1 000 abonnés Instagram', icon:'📸', price:'9,75€'},
+  {service:'2 000 abonnés Instagram', icon:'📸', price:'19,50€'},
+  {service:'5 000 abonnés Instagram', icon:'📸', price:'48,75€'},
+  {service:'500 likes Instagram', icon:'❤️', price:'1,95€'},
+  {service:'1 000 likes Instagram', icon:'❤️', price:'3,90€'},
+  {service:'3 000 vues Reels', icon:'🎬', price:'0,57€'},
+  {service:'5 000 vues Reels', icon:'🎬', price:'0,95€'},
+  {service:'10 000 vues Reels', icon:'🎬', price:'1,90€'},
+  {service:'500 followers TikTok', icon:'🎵', price:'4,45€'},
+  {service:'1 000 followers TikTok', icon:'🎵', price:'8,90€'},
+  {service:'2 000 followers TikTok', icon:'🎵', price:'17,80€'},
+  {service:'500 likes TikTok', icon:'❤️', price:'2,00€'},
+  {service:'1 000 likes TikTok', icon:'❤️', price:'4,00€'},
+  {service:'5 000 vues TikTok', icon:'🎵', price:'0,75€'},
+  {service:'1 000 abonnés YouTube', icon:'▶️', price:'6,00€'},
+  {service:'2 000 abonnés YouTube', icon:'▶️', price:'12,00€'},
+  {service:'10 000 vues YouTube', icon:'▶️', price:'2,90€'},
+  {service:'500 followers Twitter/X', icon:'🐦', price:'3,50€'},
+  {service:'10 commentaires Instagram', icon:'💬', price:'14,90€'},
+  {service:'500 membres Telegram', icon:'✈️', price:'5,00€'},
 ];
 
-const times = ['il y a 1 min','il y a 2 min','il y a 3 min','il y a 5 min','il y a 7 min','il y a 12 min','il y a 18 min','il y a 24 min'];
+const times = ['il y a 1 min','il y a 2 min','il y a 3 min','il y a 4 min','il y a 5 min','il y a 7 min','il y a 10 min','il y a 12 min','il y a 15 min','il y a 18 min','il y a 22 min','il y a 27 min'];
+
+function randomNotif(){
+  const name = firstNames[Math.floor(Math.random()*firstNames.length)];
+  const init = lastInits[Math.floor(Math.random()*lastInits.length)];
+  const flag = flags[Math.floor(Math.random()*flags.length)];
+  const svc = services[Math.floor(Math.random()*services.length)];
+  const time = times[Math.floor(Math.random()*times.length)];
+  return { name: name+' '+init, flag, ...svc, time };
+}
 
 let notifEl = null;
-let notifIndex = 0;
 
 function createNotif(){
   if(notifEl) notifEl.remove();
-  const d = notifData[notifIndex % notifData.length];
-  const t = times[Math.floor(Math.random()*times.length)];
-  notifIndex++;
+  const d = randomNotif();
 
   notifEl = document.createElement('div');
   notifEl.className = 'purchase-notif';
@@ -634,7 +653,7 @@ function createNotif(){
       <div class="notif-name">${d.flag} ${d.name}</div>
       <div class="notif-service">${d.service}</div>
       <div class="notif-footer">
-        <span class="notif-time">${t}</span>
+        <span class="notif-time">${d.time}</span>
         <span class="notif-price">${d.price}</span>
       </div>
     </div>
