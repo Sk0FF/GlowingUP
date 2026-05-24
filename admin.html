@@ -1160,8 +1160,8 @@ async function loadPayments(){
     document.getElementById('pay-avg').textContent = avg+'€';
     document.getElementById('pay-pending').textContent = pending;
 
-    const statusMap = {succeeded:'Réussi', pending:'En attente', canceled:'Annulé', requires_payment_method:'Échoué'};
-    const statusClass = {succeeded:'status-delivered', pending:'status-pending', canceled:'status-cancelled', requires_payment_method:'status-cancelled'};
+    const statusMap = {paid:'Payé ✓', unpaid:'Non payé', no_payment_required:'Gratuit', succeeded:'Réussi', pending:'En attente', canceled:'Annulé'};
+    const statusClass = {paid:'status-delivered', succeeded:'status-delivered', unpaid:'status-pending', pending:'status-pending', canceled:'status-cancelled', no_payment_required:'status-processing'};
 
     document.getElementById('paymentsTable').innerHTML = payments.length ? payments.map(p=>`
       <tr>
