@@ -432,7 +432,7 @@ tbody tr:hover td{color:var(--text)}
       </div>
       <div class="table-wrap">
         <table>
-          <thead><tr><th>ID Stripe</th><th>Montant</th><th>Service</th><th>Email</th><th>Date</th><th>Statut</th><th>Reçu</th></tr></thead>
+          <thead><tr><th>ID Stripe</th><th>Montant</th><th>Service</th><th>Plateforme</th><th>Email</th><th>Date</th><th>Statut</th><th>Reçu</th></tr></thead>
           <tbody id="paymentsTable"><tr><td colspan="7"><div class="empty"><div class="empty-icon">💳</div><div class="empty-text">Chargement...</div></div></td></tr></tbody>
         </table>
       </div>
@@ -1167,13 +1167,14 @@ async function loadPayments(){
       <tr>
         <td class="td-id" style="font-size:10px;color:var(--text3)">${p.id.substring(0,20)}...</td>
         <td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--green)">${p.amount.toFixed(2)}€</span></td>
-        <td class="td-service" style="font-size:12px;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.description}</td>
+        <td class="td-service" style="font-size:12px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.description}</td>
+        <td style="font-size:12px;color:var(--text2)">${p.platform||'—'}</td>
         <td class="td-link">${p.email}</td>
         <td class="td-date">${new Date(p.created).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})}</td>
         <td><span class="status-badge ${statusClass[p.status]||'status-pending'}">${statusMap[p.status]||p.status}</span></td>
-        <td>${p.receipt_url ? `<a href="${p.receipt_url}" target="_blank" style="color:var(--green);font-size:12px;text-decoration:none;border:1px solid var(--green-border);padding:4px 10px;border-radius:6px;transition:all .2s" onmouseover="this.style.background='var(--green-dim)'" onmouseout="this.style.background='none'">Voir →</a>` : '<span style="color:var(--text3);font-size:11px">—</span>'}</td>
+        <td>${p.receipt_url ? `<a href="${p.receipt_url}" target="_blank" style="color:var(--green);font-size:12px;text-decoration:none;border:1px solid var(--green-border);padding:4px 10px;border-radius:6px">Voir →</a>` : '<span style="color:var(--text3);font-size:11px">—</span>'}</td>
       </tr>
-    `).join('') : '<tr><td colspan="7"><div class="empty"><div class="empty-icon">💳</div><div class="empty-text">Aucun paiement</div></div></td></tr>';
+    `).join('') : '<tr><td colspan="8"><div class="empty"><div class="empty-icon">💳</div><div class="empty-text">Aucun paiement</div></div></td></tr>';
   } catch(e){ showToast('Erreur chargement paiements'); }
 }
 
