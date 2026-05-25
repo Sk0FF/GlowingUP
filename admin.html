@@ -230,6 +230,7 @@ tbody tr:hover td{color:var(--text)}
           <button class="period-btn" onclick="setPeriod('week',this)">Semaine</button>
           <button class="period-btn" onclick="setPeriod('month',this)">Mois</button>
           <button class="period-btn" onclick="setPeriod('year',this)">Année</button>
+          <button class="period-btn" onclick="setPeriod('all',this)">Total</button>
         </div>
       </div>
       <div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;margin-bottom:16px;display:flex;align-items:center;gap:40px;flex-wrap:wrap">
@@ -251,6 +252,25 @@ tbody tr:hover td{color:var(--text)}
         <div class="stat-card"><div class="stat-label">Panier moyen</div><div class="stat-value green" id="stat-avg">—</div><div class="stat-sub">Par commande</div></div>
         <div class="stat-card"><div class="stat-label">Codes promo utilisés</div><div class="stat-value green" id="stat-promo-count">—</div><div class="stat-sub" id="stat-promo-saving">Commandes avec promo</div></div>
         <div class="stat-card"><div class="stat-label">Taux de livraison</div><div class="stat-value green" id="stat-rate">—</div><div class="stat-sub">Commandes livrées</div></div>
+      </div>
+
+      <!-- ALL TIME TOTALS -->
+      <div style="background:var(--card);border:1px solid var(--line2);border-radius:16px;padding:20px 28px;margin-bottom:24px;display:flex;align-items:center;gap:40px;flex-wrap:wrap">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;flex-shrink:0">📊 Total all-time</div>
+        <div style="display:flex;gap:32px;flex-wrap:wrap">
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">CA total</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--green);letter-spacing:1px" id="stat-alltime-rev">—</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Bénéfice total</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:#00ffcc;letter-spacing:1px" id="stat-alltime-profit">—</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Commandes totales</div>
+            <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--white);letter-spacing:1px" id="stat-alltime-orders">—</div>
+          </div>
+        </div>
       </div>
       <div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
@@ -713,15 +733,22 @@ function updatePeriodStats(){
   } else if(currentPeriod === 'year'){
     filtered = allOrders.filter(o => new Date(o.created_at).getFullYear() === now.getFullYear());
     label = 'Cette année';
+  } else if(currentPeriod === 'all'){
+    filtered = allOrders;
+    label = 'Tout le temps';
   }
 
   const revenue = filtered.reduce((s,o) => s + parseFloat(o.amount||0), 0);
-  const profit = revenue * 0.6;
+  const profit = (revenue - revenue / 2.5);
   const pending = filtered.filter(o=>o.status==='pending').length;
   const delivered = filtered.filter(o=>o.status==='delivered').length;
   const cancelled = filtered.filter(o=>o.status==='cancelled').length;
   const avg = filtered.length ? (revenue/filtered.length).toFixed(2) : '0.00';
   const rate = filtered.length ? Math.round(delivered/filtered.length*100) : 0;
+
+  // All-time totals for comparison
+  const allRevenue = allOrders.reduce((s,o) => s + parseFloat(o.amount||0), 0);
+  const allProfit = (allRevenue - allRevenue / 2.5);
 
   // Top service
   const svcCount = {};
@@ -739,6 +766,11 @@ function updatePeriodStats(){
   document.getElementById('stat-avg').textContent = avg+'€';
   document.getElementById('stat-rate').textContent = rate+'%';
   document.getElementById('chart-period-label').textContent = label;
+
+  // All-time in sidebar
+  if(document.getElementById('stat-alltime-rev')) document.getElementById('stat-alltime-rev').textContent = allRevenue.toFixed(2)+'€';
+  if(document.getElementById('stat-alltime-profit')) document.getElementById('stat-alltime-profit').textContent = allProfit.toFixed(2)+'€';
+  if(document.getElementById('stat-alltime-orders')) document.getElementById('stat-alltime-orders').textContent = allOrders.length;
 
   // Promo stats
   const promoOrders = filtered.filter(o => o.promo_code);
