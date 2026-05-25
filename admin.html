@@ -1150,10 +1150,10 @@ async function loadPayments(){
     const res = await fetch(`${API}/api/admin/payments`,{headers:{'Authorization':'Bearer '+token}});
     const payments = await res.json();
 
-    const succeeded = payments.filter(p=>p.status==='succeeded');
-    const total = succeeded.reduce((s,p)=>s+p.amount,0);
+    const succeeded = payments.filter(p => ['succeeded','paid','complete'].includes(p.status));
+    const total = succeeded.reduce((s,p) => s + (parseFloat(p.amount) || 0), 0);
     const avg = succeeded.length ? (total/succeeded.length).toFixed(2) : '0.00';
-    const pending = payments.filter(p=>p.status!=='succeeded').length;
+    const pending = payments.filter(p => ['open','pending','unpaid'].includes(p.status)).length;
 
     document.getElementById('pay-total').textContent = total.toFixed(2)+'€';
     document.getElementById('pay-count').textContent = succeeded.length;
@@ -1166,7 +1166,7 @@ async function loadPayments(){
     document.getElementById('paymentsTable').innerHTML = payments.length ? payments.map(p=>`
       <tr>
         <td class="td-id" style="font-size:10px;color:var(--text3)">${p.id.substring(0,20)}...</td>
-        <td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--green)">${p.amount.toFixed(2)}€</span></td>
+        <td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--green)">${(parseFloat(p.amount)||0).toFixed(2)}€</span></td>
         <td class="td-service" style="font-size:12px;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${p.description}</td>
         <td style="font-size:12px;color:var(--text2)">${p.platform||'—'}</td>
         <td class="td-link">${p.email}</td>
