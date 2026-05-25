@@ -394,28 +394,37 @@ tbody tr:hover td{color:var(--text)}
 
     <!-- TRAFFIC -->
     <div class="page" id="page-traffic" style="display:none">
-      <div class="page-title">TRAFIC</div>
-      <div class="page-sub">Statistiques de visites via Google Analytics</div>
+      <div class="page-title">TRAFIC & ACTIVITÉ</div>
+      <div class="page-sub">Statistiques d'activité basées sur tes commandes</div>
+
+      <!-- STATS ROW -->
       <div class="stats-row" style="margin-bottom:24px">
-        <div class="stat-card"><div class="stat-label">Visiteurs aujourd'hui</div><div class="stat-value green" id="traffic-today">—</div><div class="stat-sub">Utilisateurs actifs</div></div>
-        <div class="stat-card"><div class="stat-label">Page la + visitée</div><div style="font-size:13px;font-weight:600;color:var(--white);margin-top:6px" id="traffic-top-page">—</div><div class="stat-sub">Ce mois</div></div>
-        <div class="stat-card"><div class="stat-label">Taux de rebond</div><div class="stat-value" id="traffic-bounce">—</div><div class="stat-sub">Quittent sans cliquer</div></div>
-        <div class="stat-card"><div class="stat-label">Durée moyenne</div><div class="stat-value" id="traffic-duration">—</div><div class="stat-sub">Par session</div></div>
+        <div class="stat-card"><div class="stat-label">Commandes aujourd'hui</div><div class="stat-value green" id="traf-today">—</div><div class="stat-sub">vs hier</div></div>
+        <div class="stat-card"><div class="stat-label">Heure de pointe</div><div class="stat-value" id="traf-peak-hour">—</div><div class="stat-sub">Le plus actif</div></div>
+        <div class="stat-card"><div class="stat-label">Jour de pointe</div><div class="stat-value" id="traf-peak-day">—</div><div class="stat-sub">Cette semaine</div></div>
+        <div class="stat-card"><div class="stat-label">Top plateforme</div><div class="stat-value green" id="traf-top-plat">—</div><div class="stat-sub">Le + commandé</div></div>
       </div>
-      <div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:32px;text-align:center;margin-bottom:20px">
-        <div style="font-size:40px;margin-bottom:16px">📊</div>
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--white);margin-bottom:8px">GOOGLE ANALYTICS CONNECTÉ</div>
-        <div style="font-size:13px;color:var(--text2);margin-bottom:24px;line-height:1.7">Ton ID <span style="color:var(--green);font-family:'Bebas Neue',sans-serif;letter-spacing:1px">G-PHDEL235TR</span> est actif sur toutes les pages.</div>
-        <a href="https://analytics.google.com" target="_blank" style="display:inline-flex;align-items:center;gap:8px;background:var(--green);color:#020902;padding:12px 28px;border-radius:9px;font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:2px;text-decoration:none">OUVRIR GOOGLE ANALYTICS →</a>
+
+      <!-- COMMANDES PAR HEURE -->
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;margin-bottom:16px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--white);margin-bottom:4px">COMMANDES PAR HEURE</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:24px">Distribution sur 24h</div>
+        <canvas id="hourChart" height="80"></canvas>
       </div>
-      <div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--white);margin-bottom:20px">PAGES TRACKÉES</div>
-        <div style="display:flex;flex-direction:column;gap:10px">
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px"><div style="display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></div><span style="font-size:13px;color:var(--text)">Accueil</span></div><span style="font-size:11px;color:var(--text3)">index.html</span></div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px"><div style="display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></div><span style="font-size:13px;color:var(--text)">Services</span></div><span style="font-size:11px;color:var(--text3)">services.html</span></div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px"><div style="display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></div><span style="font-size:13px;color:var(--text)">Connexion</span></div><span style="font-size:11px;color:var(--text3)">login.html</span></div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px"><div style="display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></div><span style="font-size:13px;color:var(--text)">Mon Compte</span></div><span style="font-size:11px;color:var(--text3)">compte.html</span></div>
-          <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--surface);border:1px solid var(--line);border-radius:10px"><div style="display:flex;align-items:center;gap:10px"><div style="width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 6px var(--green)"></div><span style="font-size:13px;color:var(--text)">Confirmation</span></div><span style="font-size:11px;color:var(--text3)">success.html</span></div>
+
+      <!-- COMMANDES PAR JOUR DE LA SEMAINE + GA -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--white);margin-bottom:4px">PAR JOUR DE LA SEMAINE</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:24px">Volume de commandes</div>
+          <canvas id="dayChart" height="180"></canvas>
+        </div>
+        <div style="background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">
+          <div style="font-size:40px;margin-bottom:16px">📊</div>
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--white);margin-bottom:8px">GOOGLE ANALYTICS</div>
+          <div style="font-size:13px;color:var(--text2);margin-bottom:20px;line-height:1.6">Visiteurs, pages vues, durée de session et plus encore.</div>
+          <a href="https://analytics.google.com" target="_blank" style="background:var(--green);color:#020902;padding:11px 24px;border-radius:9px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;text-decoration:none">OUVRIR GA →</a>
+          <div style="margin-top:12px;font-size:11px;color:var(--text3)">ID : G-PHDEL235TR</div>
         </div>
       </div>
     </div>
@@ -1134,6 +1143,7 @@ function showPage(page){
   if(page==='promos') loadPromos();
   if(page==='clients') loadClients();
   if(page==='payments') loadPayments();
+  if(page==='traffic') loadTraffic();
   setTimeout(()=>{ typeTitle(document.querySelector('#page-'+page+' .page-title')); animateCards(); },50);
 }
 const _origShowDash = showDashboard;
@@ -1272,6 +1282,93 @@ window.addEventListener('load', () => {
     }
   }, 500);
 });
+
+/* ── TRAFFIC ── */
+let hourChart = null, dayChart = null;
+
+function loadTraffic(){
+  const orders = allOrders;
+  if(!orders.length){ return; }
+
+  const now = new Date();
+  const todayStr = now.toISOString().split('T')[0];
+  const yesterdayStr = new Date(now - 86400000).toISOString().split('T')[0];
+
+  // Today vs yesterday
+  const todayOrders = orders.filter(o => o.created_at?.startsWith(todayStr)).length;
+  const yesterdayOrders = orders.filter(o => o.created_at?.startsWith(yesterdayStr)).length;
+  const diff = todayOrders - yesterdayOrders;
+  document.getElementById('traf-today').textContent = todayOrders;
+
+  // Heure de pointe
+  const hourCount = Array(24).fill(0);
+  orders.forEach(o => {
+    const h = new Date(o.created_at).getHours();
+    hourCount[h]++;
+  });
+  const peakHour = hourCount.indexOf(Math.max(...hourCount));
+  document.getElementById('traf-peak-hour').textContent = `${peakHour}h - ${peakHour+1}h`;
+
+  // Jour de pointe
+  const days = ['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'];
+  const dayCount = Array(7).fill(0);
+  orders.forEach(o => {
+    const d = new Date(o.created_at).getDay();
+    dayCount[d]++;
+  });
+  const peakDay = dayCount.indexOf(Math.max(...dayCount));
+  document.getElementById('traf-peak-day').textContent = days[peakDay];
+
+  // Top plateforme
+  const platCount = {};
+  orders.forEach(o => { platCount[o.platform] = (platCount[o.platform]||0)+1; });
+  const topPlat = Object.entries(platCount).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('traf-top-plat').textContent = topPlat ? topPlat[0] : '—';
+
+  // Chart heure
+  if(hourChart) hourChart.destroy();
+  hourChart = new Chart(document.getElementById('hourChart'), {
+    type: 'bar',
+    data: {
+      labels: Array.from({length:24}, (_,i) => `${i}h`),
+      datasets: [{
+        data: hourCount,
+        backgroundColor: hourCount.map((v,i) => i===peakHour ? 'rgba(77,255,124,0.6)' : 'rgba(77,255,124,0.15)'),
+        borderColor: hourCount.map((v,i) => i===peakHour ? '#4dff7c' : 'rgba(77,255,124,0.3)'),
+        borderWidth: 1, borderRadius: 4
+      }]
+    },
+    options: {
+      plugins: { legend:{display:false}, tooltip:{backgroundColor:'#0f1210',titleColor:'#4dff7c',bodyColor:'#e5ede7',borderColor:'#1a1f1b',borderWidth:1} },
+      scales: {
+        x: { grid:{display:false}, ticks:{color:'#4d5e50',font:{size:10}} },
+        y: { grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#4d5e50',font:{size:10}} }
+      }
+    }
+  });
+
+  // Chart jour
+  if(dayChart) dayChart.destroy();
+  dayChart = new Chart(document.getElementById('dayChart'), {
+    type: 'bar',
+    data: {
+      labels: days,
+      datasets: [{
+        data: dayCount,
+        backgroundColor: dayCount.map((v,i) => i===peakDay ? 'rgba(77,255,124,0.6)' : 'rgba(77,255,124,0.15)'),
+        borderColor: dayCount.map((v,i) => i===peakDay ? '#4dff7c' : 'rgba(77,255,124,0.3)'),
+        borderWidth: 1, borderRadius: 6
+      }]
+    },
+    options: {
+      plugins: { legend:{display:false}, tooltip:{backgroundColor:'#0f1210',titleColor:'#4dff7c',bodyColor:'#e5ede7',borderColor:'#1a1f1b',borderWidth:1} },
+      scales: {
+        x: { grid:{display:false}, ticks:{color:'#8fa893',font:{size:11}} },
+        y: { grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#4d5e50',font:{size:10}} }
+      }
+    }
+  });
+}
 
 // Auto refresh every 30s
 setInterval(()=>{ if(token){ loadOrders(); loadStats(); } }, 30000);
