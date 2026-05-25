@@ -181,6 +181,7 @@ nav{position:fixed;inset:0 0 auto;z-index:200;display:flex;align-items:center;ju
     <li><a href="index.html">Accueil</a></li>
     <li><a href="services.html" class="active">Services</a></li>
     <li><a href="index.html#how">Comment ça marche</a></li>
+    <li><a href="tarifs.html">Tarifs</a></li>
     <li><a href="index.html#faq">FAQ</a></li>
   </ul>
   <div class="n-right" id="nav-right">
@@ -715,6 +716,26 @@ let currentPlatform = '';
 let currentServiceId = '';
 let appliedDiscount = 0;
 let appliedCode = '';
+let subDiscount = 0; // subscription discount
+
+// Check subscription on load
+async function checkSubscription(){
+  const token = localStorage.getItem('user_token');
+  if(!token) return;
+  try {
+    const res = await fetch(`${API}/api/my-subscription`, {headers:{'Authorization':'Bearer '+token}});
+    const sub = await res.json();
+    if(sub && sub.status === 'active'){
+      subDiscount = sub.plan === 'pro' ? 20 : 10;
+      // Show badge
+      const badge = document.createElement('div');
+      badge.style.cssText = 'position:fixed;top:68px;right:20px;background:var(--green-dim);border:1px solid var(--green-border);color:var(--green);padding:5px 14px;border-radius:100px;font-size:11px;font-weight:700;letter-spacing:1px;z-index:100';
+      badge.textContent = sub.plan === 'pro' ? '👑 PRO — -20% appliqué' : '⭐ STARTER — -10% appliqué';
+      document.body.appendChild(badge);
+    }
+  } catch{}
+}
+checkSubscription();
 
 function toggleDetail(id){
   const row = document.getElementById(id);
@@ -779,8 +800,10 @@ function calcTotal(){
     return;
   }
   const base = parseFloat((qty / 1000 * currentPrice).toFixed(2));
-  if(appliedDiscount > 0){
-    const discounted = parseFloat((base * (1 - appliedDiscount/100)).toFixed(2));
+  // Best discount: promo or subscription
+  const bestDiscount = Math.max(appliedDiscount, subDiscount);
+  if(bestDiscount > 0){
+    const discounted = parseFloat((base * (1 - bestDiscount/100)).toFixed(2));
     document.getElementById('m-original-price').textContent = base.toFixed(2) + ' €';
     document.getElementById('m-original-price').style.display = 'block';
     document.getElementById('m-total').textContent = discounted.toFixed(2) + ' €';
@@ -834,8 +857,9 @@ async function submitOrder(){
   if(qty < 1){ alert('Merci d\'entrer une quantité'); return; }
 
   const originalAmount = parseFloat((qty / 1000 * currentPrice).toFixed(2));
-  const finalAmount = appliedDiscount > 0
-    ? parseFloat((originalAmount * (1 - appliedDiscount/100)).toFixed(2))
+  const bestDiscount = Math.max(appliedDiscount, subDiscount);
+  const finalAmount = bestDiscount > 0
+    ? parseFloat((originalAmount * (1 - bestDiscount/100)).toFixed(2))
     : originalAmount;
 
   if(finalAmount < 0.5){ alert('Le montant minimum est de 0,50€'); return; }
