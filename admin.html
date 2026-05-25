@@ -184,6 +184,10 @@ tbody tr:hover td{color:var(--text)}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
       Abonnements
     </div>
+    <div class="nav-item" onclick="showPage('admins')" id="nav-admins">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/><path d="M16 11l2 2 4-4"/></svg>
+      Admins
+    </div>
     <div class="sidebar-bottom">
       <button class="btn-logout" onclick="logout()">Se déconnecter</button>
     </div>
@@ -483,6 +487,28 @@ tbody tr:hover td{color:var(--text)}
         </table>
       </div>
     </div>
+
+    <!-- ADMINS -->
+    <div class="page" id="page-admins" style="display:none">
+      <div class="page-title">ADMINISTRATEURS</div>
+      <div class="page-sub">Gérez les comptes admin du dashboard</div>
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:24px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--white);margin-bottom:20px">AJOUTER UN ADMIN</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end">
+          <div><div class="stat-label" style="margin-bottom:6px">Email</div><input type="email" id="new-admin-email" class="search-input" placeholder="email@exemple.com" style="width:100%"></div>
+          <div><div class="stat-label" style="margin-bottom:6px">Mot de passe</div><input type="password" id="new-admin-pass" class="search-input" placeholder="Min. 6 caractères" style="width:100%"></div>
+          <button onclick="createAdmin()" style="background:var(--green);border:none;color:#020902;padding:10px 20px;border-radius:9px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:1px;cursor:pointer;height:40px">CRÉER →</button>
+        </div>
+        <div id="admin-create-msg" style="font-size:12px;margin-top:10px;display:none"></div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ID</th><th>Email</th><th>Créé le</th><th>Actions</th></tr></thead>
+          <tbody id="adminsTable"><tr><td colspan="4"><div class="empty"><div class="empty-icon">👤</div><div class="empty-text">Chargement...</div></div></td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
 
   </div>
 </div>
@@ -1182,6 +1208,7 @@ function showPage(page){
   if(page==='payments') loadPayments();
   if(page==='traffic') loadTraffic();
   if(page==='subs') loadSubs();
+  if(page==='admins') loadAdmins();
   setTimeout(()=>{ typeTitle(document.querySelector('#page-'+page+' .page-title')); animateCards(); },50);
 }
 const _origShowDash = showDashboard;
@@ -1449,6 +1476,58 @@ async function loadSubs(){
       </tr>
     `).join('');
   } catch(e){ showToast('Erreur chargement abonnements'); }
+}
+
+/* ── ADMINS ── */
+async function loadAdmins(){
+  try {
+    const res = await fetch(`${API}/api/admin/admins`,{headers:{'Authorization':'Bearer '+token}});
+    const admins = await res.json();
+    const tbody = document.getElementById('adminsTable');
+    tbody.innerHTML = admins.map(a => `
+      <tr>
+        <td class="td-id">#${a.id}</td>
+        <td style="font-size:13px;color:var(--text)">${a.email}</td>
+        <td class="td-date">${new Date(a.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'})}</td>
+        <td>
+          ${a.email !== '${process.env.ADMIN_EMAIL}' ? `<button onclick="deleteAdmin(${a.id})" class="btn-delete">🗑</button>` : '<span style="font-size:11px;color:var(--text3)">Principal</span>'}
+        </td>
+      </tr>
+    `).join('');
+  } catch { showToast('Erreur chargement admins'); }
+}
+
+async function createAdmin(){
+  const email = document.getElementById('new-admin-email').value.trim();
+  const pass = document.getElementById('new-admin-pass').value;
+  const msg = document.getElementById('admin-create-msg');
+  if(!email || !pass){ msg.textContent='⚠️ Remplis tous les champs'; msg.style.color='#ffaa33'; msg.style.display='block'; return; }
+  if(pass.length < 6){ msg.textContent='⚠️ Mot de passe trop court'; msg.style.color='#ffaa33'; msg.style.display='block'; return; }
+  try {
+    const res = await fetch(`${API}/api/admin/admins`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+      body: JSON.stringify({email, password: pass})
+    });
+    const data = await res.json();
+    if(data.success){
+      document.getElementById('new-admin-email').value='';
+      document.getElementById('new-admin-pass').value='';
+      msg.textContent='✓ Admin créé !'; msg.style.color='var(--green)'; msg.style.display='block';
+      setTimeout(()=>msg.style.display='none', 3000);
+      loadAdmins();
+      showToast('Admin créé ✓');
+    } else {
+      msg.textContent='✗ '+(data.error||'Erreur'); msg.style.color='#ff4d4d'; msg.style.display='block';
+    }
+  } catch { msg.textContent='✗ Erreur'; msg.style.color='#ff4d4d'; msg.style.display='block'; }
+}
+
+async function deleteAdmin(id){
+  if(!confirm('Supprimer cet admin ?')) return;
+  await fetch(`${API}/api/admin/admins/${id}`,{method:'DELETE',headers:{'Authorization':'Bearer '+token}});
+  loadAdmins();
+  showToast('Admin supprimé');
 }
 
 // Auto refresh every 30s
