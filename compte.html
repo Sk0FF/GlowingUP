@@ -91,6 +91,31 @@ nav{position:fixed;inset:0 0 auto;z-index:200;display:flex;align-items:center;ju
 
 <div class="main">
 
+  <!-- SUBSCRIPTION -->
+  <div id="sub-section" style="display:none;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;margin-bottom:24px;position:relative;overflow:hidden">
+    <div style="position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--green),transparent)"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+      <div>
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Mon abonnement</div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--white)" id="sub-plan-name">—</div>
+        <div style="font-size:12px;color:var(--text3);margin-top:3px" id="sub-plan-end">—</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span id="sub-discount-badge" style="font-size:13px;font-weight:700;padding:6px 16px;border-radius:100px;background:var(--green-dim);color:var(--green);border:1px solid var(--green-border)">—</span>
+        <button onclick="cancelSub()" id="btn-cancel-sub" style="background:none;border:1px solid rgba(255,77,77,.2);color:var(--red);padding:7px 16px;border-radius:8px;font-size:12px;cursor:pointer;transition:all .2s" onmouseover="this.style.background='rgba(255,77,77,.1)'" onmouseout="this.style.background='none'">Annuler</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- NO SUBSCRIPTION -->
+  <div id="no-sub-section" style="background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px">
+    <div>
+      <div style="font-size:14px;font-weight:600;color:var(--white);margin-bottom:4px">Passe à un plan premium</div>
+      <div style="font-size:13px;color:var(--text3)">Économise jusqu'à -20% sur tous tes services</div>
+    </div>
+    <a href="tarifs.html" style="background:var(--green);color:#020902;padding:10px 24px;border-radius:9px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;text-decoration:none">VOIR LES PLANS →</a>
+  </div>
+
   <!-- PROFILE -->
   <div class="profile-card">
     <div class="profile-avatar" id="profile-avatar">?</div>
@@ -128,6 +153,21 @@ const token = localStorage.getItem('user_token');
 const userData = JSON.parse(localStorage.getItem('user_data') || 'null');
 
 if (!token) window.location.href = 'login.html';
+
+async function cancelSub(){
+  if(!confirm('Annuler ton abonnement ? Il restera actif jusqu\'à la fin de la période payée.')) return;
+  try {
+    const res = await fetch(`${API}/api/cancel-subscription`, {
+      method: 'POST',
+      headers: {'Authorization': 'Bearer '+token}
+    });
+    const data = await res.json();
+    if(data.success){
+      alert('Abonnement annulé. Il reste actif jusqu\'à la fin de la période.');
+      window.location.reload();
+    }
+  } catch { alert('Erreur. Réessaie.'); }
+}
 
 function logout(){
   localStorage.removeItem('user_token');
@@ -167,7 +207,25 @@ async function loadData(){
       document.getElementById('profile-since').textContent = 'Membre depuis ' + new Date(me.created_at).toLocaleDateString('fr-FR', {month:'long',year:'numeric'});
     } catch{}
 
-    // Stats
+    // Check subscription
+  try {
+    const subRes = await fetch(`${API}/api/my-subscription`, {headers:{'Authorization':'Bearer '+token}});
+    const sub = await subRes.json();
+    if(sub && (sub.status === 'active' || sub.status === 'canceling')){
+      document.getElementById('sub-section').style.display = 'block';
+      document.getElementById('no-sub-section').style.display = 'none';
+      const planNames = { starter: '⭐ Plan Starter', pro: '👑 Plan Pro' };
+      const discounts = { starter: '-10% sur tous les services', pro: '-20% sur tous les services' };
+      document.getElementById('sub-plan-name').textContent = planNames[sub.plan] || sub.plan;
+      document.getElementById('sub-discount-badge').textContent = discounts[sub.plan] || '';
+      document.getElementById('sub-plan-end').textContent = sub.status === 'canceling' 
+        ? `Annulation prévue le ${new Date(sub.current_period_end).toLocaleDateString('fr-FR')}`
+        : `Renouvellement le ${new Date(sub.current_period_end).toLocaleDateString('fr-FR')}`;
+      if(sub.status === 'canceling') document.getElementById('btn-cancel-sub').style.display = 'none';
+    }
+  } catch{}
+
+  // Stats
     const total = orders.length;
     const spent = orders.reduce((s,o)=>s+parseFloat(o.amount||0),0);
     const delivered = orders.filter(o=>o.status==='delivered').length;

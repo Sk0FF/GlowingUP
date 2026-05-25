@@ -180,6 +180,10 @@ tbody tr:hover td{color:var(--text)}
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
       Paiements
     </div>
+    <div class="nav-item" onclick="showPage('subs')" id="nav-subs">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      Abonnements
+    </div>
     <div class="sidebar-bottom">
       <button class="btn-logout" onclick="logout()">Se déconnecter</button>
     </div>
@@ -426,6 +430,39 @@ tbody tr:hover td{color:var(--text)}
           <a href="https://analytics.google.com" target="_blank" style="background:var(--green);color:#020902;padding:11px 24px;border-radius:9px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:2px;text-decoration:none">OUVRIR GA →</a>
           <div style="margin-top:12px;font-size:11px;color:var(--text3)">ID : G-PHDEL235TR</div>
         </div>
+      </div>
+    </div>
+
+    <!-- SUBSCRIPTIONS -->
+    <div class="page" id="page-subs" style="display:none">
+      <div class="page-title">ABONNEMENTS</div>
+      <div class="page-sub">Gérez vos abonnés actifs et revenus récurrents</div>
+
+      <!-- STATS -->
+      <div class="stats-row" style="margin-bottom:24px">
+        <div class="stat-card"><div class="stat-label">Abonnés actifs</div><div class="stat-value green" id="sub-total">—</div><div class="stat-sub">Total actifs</div></div>
+        <div class="stat-card"><div class="stat-label">MRR</div><div class="stat-value green" id="sub-mrr">—</div><div class="stat-sub">Revenus récurrents/mois</div></div>
+        <div class="stat-card"><div class="stat-label">Plan Starter</div><div class="stat-value" id="sub-starter">—</div><div class="stat-sub">4,99€/mois</div></div>
+        <div class="stat-card"><div class="stat-label">Plan Pro</div><div class="stat-value" id="sub-pro">—</div><div class="stat-sub">14,99€/mois</div></div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Client</th>
+              <th>Email</th>
+              <th>Plan</th>
+              <th>Statut</th>
+              <th>Fin période</th>
+              <th>Depuis</th>
+            </tr>
+          </thead>
+          <tbody id="subsTable">
+            <tr><td colspan="6"><div class="empty"><div class="empty-icon">⭐</div><div class="empty-text">Chargement...</div></div></td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
 
@@ -1144,6 +1181,7 @@ function showPage(page){
   if(page==='clients') loadClients();
   if(page==='payments') loadPayments();
   if(page==='traffic') loadTraffic();
+  if(page==='subs') loadSubs();
   setTimeout(()=>{ typeTitle(document.querySelector('#page-'+page+' .page-title')); animateCards(); },50);
 }
 const _origShowDash = showDashboard;
@@ -1368,6 +1406,49 @@ function loadTraffic(){
       }
     }
   });
+}
+
+/* ── SUBSCRIPTIONS ── */
+async function loadSubs(){
+  try {
+    const res = await fetch(`${API}/api/admin/subscriptions`,{headers:{'Authorization':'Bearer '+token}});
+    const subs = await res.json();
+
+    const active = subs.filter(s => s.status === 'active' || s.status === 'canceling');
+    const starters = active.filter(s => s.plan === 'starter').length;
+    const pros = active.filter(s => s.plan === 'pro').length;
+    const mrr = (starters * 4.99 + pros * 14.99).toFixed(2);
+
+    document.getElementById('sub-total').textContent = active.length;
+    document.getElementById('sub-mrr').textContent = mrr + '€';
+    document.getElementById('sub-starter').textContent = starters;
+    document.getElementById('sub-pro').textContent = pros;
+
+    const tbody = document.getElementById('subsTable');
+    if(!subs.length){
+      tbody.innerHTML = '<tr><td colspan="6"><div class="empty"><div class="empty-icon">⭐</div><div class="empty-text">Aucun abonnement</div></div></td></tr>';
+      return;
+    }
+
+    const planColors = { starter: '#ffcc44', pro: '#4dff7c' };
+    const planLabels = { starter: '⭐ Starter', pro: '👑 Pro' };
+    const statusMap = { active: 'Actif', canceling: 'Annulation en cours', canceled: 'Annulé' };
+    const statusClass = { active: 'status-delivered', canceling: 'status-pending', canceled: 'status-cancelled' };
+
+    tbody.innerHTML = subs.map(s => `
+      <tr>
+        <td style="font-size:13px;font-weight:600;color:var(--text)">${s.name || '—'}</td>
+        <td class="td-link">${s.email}</td>
+        <td>
+          <span style="font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:${planColors[s.plan]||'var(--text)'}">${planLabels[s.plan]||s.plan}</span>
+          <div style="font-size:10px;color:var(--text3)">${s.plan === 'pro' ? '14,99€/mois' : '4,99€/mois'}</div>
+        </td>
+        <td><span class="status-badge ${statusClass[s.status]||'status-pending'}">${statusMap[s.status]||s.status}</span></td>
+        <td class="td-date">${s.current_period_end ? new Date(s.current_period_end).toLocaleDateString('fr-FR') : '—'}</td>
+        <td class="td-date">${new Date(s.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'})}</td>
+      </tr>
+    `).join('');
+  } catch(e){ showToast('Erreur chargement abonnements'); }
 }
 
 // Auto refresh every 30s
