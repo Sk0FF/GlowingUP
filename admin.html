@@ -1133,6 +1133,7 @@ function showPage(page){
   if(page==='analyse') setTimeout(renderAnalyse, 100);
   if(page==='promos') loadPromos();
   if(page==='clients') loadClients();
+  if(page==='payments') loadPayments();
   setTimeout(()=>{ typeTitle(document.querySelector('#page-'+page+' .page-title')); animateCards(); },50);
 }
 const _origShowDash = showDashboard;
