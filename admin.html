@@ -491,9 +491,11 @@ tbody tr:hover td{color:var(--text)}
     <!-- ADMINS -->
     <div class="page" id="page-admins" style="display:none">
       <div class="page-title">ADMINISTRATEURS</div>
-      <div class="page-sub">Gérez les comptes admin du dashboard</div>
-      <div style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:24px">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--white);margin-bottom:20px">AJOUTER UN ADMIN</div>
+      <div class="page-sub">Gérez les comptes admin et suivez leur activité</div>
+
+      <!-- ADD ADMIN -->
+      <div style="background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin-bottom:20px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;color:var(--white);margin-bottom:16px">AJOUTER UN ADMIN</div>
         <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:end">
           <div><div class="stat-label" style="margin-bottom:6px">Email</div><input type="email" id="new-admin-email" class="search-input" placeholder="email@exemple.com" style="width:100%"></div>
           <div><div class="stat-label" style="margin-bottom:6px">Mot de passe</div><input type="password" id="new-admin-pass" class="search-input" placeholder="Min. 6 caractères" style="width:100%"></div>
@@ -501,10 +503,25 @@ tbody tr:hover td{color:var(--text)}
         </div>
         <div id="admin-create-msg" style="font-size:12px;margin-top:10px;display:none"></div>
       </div>
-      <div class="table-wrap">
+
+      <!-- ADMINS STATS -->
+      <div class="table-wrap" style="margin-bottom:20px">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--white);padding:16px 20px;border-bottom:1px solid var(--line)">COMPTES ADMINS</div>
         <table>
-          <thead><tr><th>ID</th><th>Email</th><th>Créé le</th><th>Actions</th></tr></thead>
-          <tbody id="adminsTable"><tr><td colspan="4"><div class="empty"><div class="empty-icon">👤</div><div class="empty-text">Chargement...</div></div></td></tr></tbody>
+          <thead><tr><th>Email</th><th>Dernière connexion</th><th>Actions totales</th><th>Commandes traitées</th><th>Supprimer</th></tr></thead>
+          <tbody id="adminsTable"><tr><td colspan="5"><div class="empty"><div class="empty-icon">👤</div><div class="empty-text">Chargement...</div></div></td></tr></tbody>
+        </table>
+      </div>
+
+      <!-- ACTIVITY LOG -->
+      <div class="table-wrap">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line)">
+          <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--white)">JOURNAL D'ACTIVITÉ</div>
+          <span style="font-size:11px;color:var(--text3)">100 dernières actions</span>
+        </div>
+        <table>
+          <thead><tr><th>Admin</th><th>Action</th><th>Détails</th><th>Date</th></tr></thead>
+          <tbody id="activityTable"><tr><td colspan="4"><div class="empty"><div class="empty-icon">📋</div><div class="empty-text">Chargement...</div></div></td></tr></tbody>
         </table>
       </div>
     </div>
@@ -1481,20 +1498,42 @@ async function loadSubs(){
 /* ── ADMINS ── */
 async function loadAdmins(){
   try {
-    const res = await fetch(`${API}/api/admin/admins`,{headers:{'Authorization':'Bearer '+token}});
-    const admins = await res.json();
-    const tbody = document.getElementById('adminsTable');
-    tbody.innerHTML = admins.map(a => `
+    const [statsRes, logRes] = await Promise.all([
+      fetch(`${API}/api/admin/admins-stats`,{headers:{'Authorization':'Bearer '+token}}),
+      fetch(`${API}/api/admin/activity`,{headers:{'Authorization':'Bearer '+token}})
+    ]);
+    const admins = await statsRes.json();
+    const logs = await logRes.json();
+
+    document.getElementById('adminsTable').innerHTML = admins.map(a => `
       <tr>
-        <td class="td-id">#${a.id}</td>
-        <td style="font-size:13px;color:var(--text)">${a.email}</td>
-        <td class="td-date">${new Date(a.created_at).toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'numeric'})}</td>
-        <td>
-          ${a.email !== '${process.env.ADMIN_EMAIL}' ? `<button onclick="deleteAdmin(${a.id})" class="btn-delete">🗑</button>` : '<span style="font-size:11px;color:var(--text3)">Principal</span>'}
-        </td>
+        <td style="font-size:13px;color:var(--text);font-weight:500">${a.email}</td>
+        <td class="td-date">${a.last_login ? new Date(a.last_login).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '<span style="color:var(--text3)">Jamais</span>'}</td>
+        <td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--white)">${a.total_actions}</span></td>
+        <td><span style="font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--green)">${a.orders_processed}</span></td>
+        <td><button onclick="deleteAdmin(${a.id},'${a.email}')" class="btn-delete">🗑</button></td>
       </tr>
     `).join('');
-  } catch { showToast('Erreur chargement admins'); }
+
+    const actionLabels = {
+      LOGIN:{label:'Connexion',color:'#4d96ff'},
+      ORDER_UPDATE:{label:'Commande modifiée',color:'#ffaa33'},
+      ORDER_DELETE:{label:'Commande supprimée',color:'#ff4d4d'},
+      PROMO_CREATE:{label:'Code promo créé',color:'var(--green)'},
+      CLIENT_DELETE:{label:'Client supprimé',color:'#ff4d4d'},
+    };
+
+    document.getElementById('activityTable').innerHTML = logs.length ? logs.map(l => {
+      const action = actionLabels[l.action]||{label:l.action,color:'var(--text3)'};
+      return `<tr>
+        <td style="font-size:12px;color:var(--text2)">${l.admin_email_real||'—'}</td>
+        <td><span style="font-size:11px;font-weight:700;padding:3px 10px;border-radius:100px;background:${action.color}22;color:${action.color}">${action.label}</span></td>
+        <td style="font-size:12px;color:var(--text3);max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${l.details||'—'}</td>
+        <td class="td-date">${new Date(l.created_at).toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="4"><div class="empty"><div class="empty-icon">📋</div><div class="empty-text">Aucune activité</div></div></td></tr>';
+
+  } catch(e){ showToast('Erreur chargement admins'); console.error(e); }
 }
 
 async function createAdmin(){
