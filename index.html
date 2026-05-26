@@ -812,7 +812,22 @@ window.addEventListener('load', () => {
   <button class="promo-popup-close" onclick="closePromo()">×</button>
   <span style="font-size:32px;text-align:center;display:block;margin-bottom:12px">🎁</span>
   <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--white);text-align:center;margin-bottom:6px">OFFRE EXCLUSIVE</div>
-  <div style="font-size:13px;color:var(--text2);text-align:center;line-height:1.6;margin-bottom:16px;font-weight:300">-20% sur ta première commande avec le code :</div>
+  <div style="font-size:13px;color:var(--text2);text-align:center;line-height:1.6;margin-bottom:12px;font-weight:300">-20% sur ta première commande avec le code :</div>
+
+  <!-- COUNTDOWN -->
+  <div style="display:flex;justify-content:center;gap:8px;margin-bottom:14px">
+    <div style="text-align:center;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-width:44px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--green);letter-spacing:1px;line-height:1" id="cd-min">09</div>
+      <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">min</div>
+    </div>
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--text3);align-self:center;margin-top:-8px">:</div>
+    <div style="text-align:center;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:6px 10px;min-width:44px">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--green);letter-spacing:1px;line-height:1" id="cd-sec">59</div>
+      <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px">sec</div>
+    </div>
+  </div>
+  <div style="font-size:10px;color:var(--text3);text-align:center;margin-bottom:14px">⚡ Offre limitée dans le temps !</div>
+
   <div class="promo-code-box" onclick="copyPromo()">
     <div class="promo-code-text">GLOW20</div>
     <div class="promo-code-hint">Clique pour copier 📋</div>
@@ -835,6 +850,28 @@ function copyPromo(){
     setTimeout(() => document.getElementById('promo-copied').style.display='none', 2000);
   });
 }
+
+// Countdown timer
+let cdTotal = 10 * 60; // 10 minutes
+function updateCountdown(){
+  if(cdTotal <= 0){
+    // Restart countdown
+    cdTotal = 10 * 60;
+  }
+  const min = Math.floor(cdTotal / 60);
+  const sec = cdTotal % 60;
+  const minEl = document.getElementById('cd-min');
+  const secEl = document.getElementById('cd-sec');
+  if(minEl) minEl.textContent = String(min).padStart(2,'0');
+  if(secEl){
+    secEl.textContent = String(sec).padStart(2,'0');
+    // Flash red when under 1 min
+    secEl.style.color = cdTotal < 60 ? '#ff4d4d' : 'var(--green)';
+    if(minEl) minEl.style.color = cdTotal < 60 ? '#ff4d4d' : 'var(--green)';
+  }
+  cdTotal--;
+}
+setInterval(updateCountdown, 1000);
 
 // Show popup after 8s if not already closed
 if(!localStorage.getItem('promoClosed')){
