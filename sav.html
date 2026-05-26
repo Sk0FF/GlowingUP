@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Support — GlowingUp</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-PHDEL235TR"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','G-PHDEL235TR');</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#060808;--card:#0f1210;--card2:#121512;--line:#1a1f1b;--green:#4dff7c;--green-dim:rgba(77,255,124,.09);--green-border:rgba(77,255,124,.2);--text:#e5ede7;--text2:#8fa893;--text3:#4d5e50;--white:#f0f8f2;--discord:#5865F2}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:15px;min-height:100vh}
+canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.3}
+nav{position:fixed;inset:0 0 auto;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:0 56px;height:60px;border-bottom:1px solid var(--line);background:rgba(6,8,8,.9);backdrop-filter:blur(16px)}
+.n-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--white);display:flex;align-items:center;gap:8px;text-decoration:none}
+.n-dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.n-links{display:flex;gap:28px;list-style:none}
+.n-links a{color:var(--text3);text-decoration:none;font-size:13px;font-weight:500;transition:color .2s}
+.n-links a:hover{color:var(--text)}
+
+.main{max-width:900px;margin:0 auto;padding:100px 24px 80px;position:relative;z-index:1}
+
+.hero{text-align:center;margin-bottom:60px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--green-border);background:var(--green-dim);color:var(--green);font-size:11px;font-weight:600;padding:6px 18px;border-radius:100px;margin-bottom:24px;letter-spacing:1.5px;text-transform:uppercase}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,8vw,88px);letter-spacing:3px;color:var(--white);line-height:1;margin-bottom:16px}
+.hero h1 span{color:var(--green)}
+.hero p{font-size:16px;color:var(--text2);max-width:500px;margin:0 auto;line-height:1.7;font-weight:300}
+
+/* DISCORD CARD */
+.discord-card{background:var(--card);border:1px solid rgba(88,101,242,.3);border-radius:24px;padding:48px;text-align:center;margin-bottom:32px;position:relative;overflow:hidden;box-shadow:0 0 60px rgba(88,101,242,.1)}
+.discord-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--discord),transparent)}
+.discord-logo{width:80px;height:80px;margin:0 auto 24px;background:var(--discord);border-radius:20px;display:flex;align-items:center;justify-content:center}
+.discord-logo svg{width:48px;height:48px;fill:white}
+.discord-card h2{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;color:var(--white);margin-bottom:8px}
+.discord-card p{font-size:14px;color:var(--text2);margin-bottom:32px;line-height:1.7;max-width:480px;margin-left:auto;margin-right:auto}
+.btn-discord{display:inline-flex;align-items:center;gap:12px;background:var(--discord);color:white;padding:16px 40px;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;text-decoration:none;transition:all .2s;border:none;cursor:pointer}
+.btn-discord:hover{filter:brightness(1.1);transform:translateY(-2px);box-shadow:0 8px 32px rgba(88,101,242,.4)}
+.discord-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(88,101,242,.1);border:1px solid rgba(88,101,242,.2);color:var(--discord);font-size:12px;font-weight:600;padding:5px 14px;border-radius:100px;margin-top:20px}
+.discord-badge-dot{width:7px;height:7px;border-radius:50%;background:#23d160;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* SUPPORT OPTIONS */
+.options{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:32px}
+.option-card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:28px;transition:all .25s}
+.option-card:hover{border-color:var(--green-border);transform:translateY(-3px)}
+.option-icon{font-size:32px;margin-bottom:14px}
+.option-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:var(--white);margin-bottom:6px}
+.option-desc{font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:16px;font-weight:300}
+.option-link{display:inline-flex;align-items:center;gap:6px;color:var(--green);font-size:13px;font-weight:600;text-decoration:none;transition:gap .2s}
+.option-link:hover{gap:10px}
+
+/* FAQ */
+.faq-section{margin-top:48px}
+.faq-title{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;color:var(--white);margin-bottom:24px}
+.faq{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:8px}
+.faq-q{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;cursor:pointer;font-weight:500;font-size:14px;color:var(--text)}
+.faq-q:hover{background:rgba(77,255,124,.03)}
+.faq-ic{font-size:18px;color:var(--text3);transition:transform .2s}
+.faq-a{padding:0 20px;max-height:0;overflow:hidden;transition:all .3s;font-size:13px;color:var(--text2);line-height:1.7;font-weight:300}
+.faq.open .faq-ic{transform:rotate(45deg);color:var(--green)}
+.faq.open .faq-a{padding:0 20px 16px;max-height:200px}
+</style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+
+<nav>
+  <a class="n-logo" href="index.html"><div class="n-dot"></div>GLOWING <span style="color:var(--green)">UP</span></a>
+  <ul class="n-links">
+    <li><a href="services.html">Services</a></li>
+    <li><a href="tarifs.html">Tarifs</a></li>
+    <li><a href="sav.html" style="color:var(--green)">Support</a></li>
+  </ul>
+</nav>
+
+<div class="main">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="eyebrow">🎧 Support & SAV</div>
+    <h1>ON EST LÀ<br><span>POUR TOI</span></h1>
+    <p>Une question ? Un problème avec ta commande ? Notre équipe te répond rapidement via Discord.</p>
+  </div>
+
+  <!-- DISCORD MAIN CARD -->
+  <div class="discord-card">
+    <div class="discord-logo">
+      <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z"/></svg>
+    </div>
+    <h2>REJOINS NOTRE DISCORD</h2>
+    <p>Notre serveur Discord est le moyen le plus rapide pour obtenir de l'aide. Pose ta question dans le salon support et on te répond en moins de 24h.</p>
+    <a href="https://discord.gg/wXA7xyAd89" target="_blank" class="btn-discord">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="white"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028c.462-.63.874-1.295 1.226-1.994a.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+      REJOINDRE LE DISCORD
+    </a>
+    <div><div class="discord-badge"><div class="discord-badge-dot"></div>Serveur actif</div></div>
+  </div>
+
+  <!-- OTHER OPTIONS -->
+  <div class="options">
+    <div class="option-card">
+      <div class="option-icon">💬</div>
+      <div class="option-title">CHAT EN DIRECT</div>
+      <div class="option-desc">Utilise le chat en bas à droite de notre site pour nous contacter directement en temps réel.</div>
+      <a href="javascript:void(Tawk_API.toggle())" class="option-link">Ouvrir le chat →</a>
+    </div>
+    <div class="option-card">
+      <div class="option-icon">📧</div>
+      <div class="option-title">PAR EMAIL</div>
+      <div class="option-desc">Pour les demandes non urgentes, envoie-nous un email et on te répond dans les 24h.</div>
+      <a href="mailto:glow.agencyyy@gmail.com" class="option-link">glow.agencyyy@gmail.com →</a>
+    </div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="faq-section">
+    <div class="faq-title">QUESTIONS FRÉQUENTES</div>
+    <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span>Ma commande n'a pas démarré, que faire ?</span><span class="faq-ic">+</span></div><div class="faq-a">Le démarrage peut prendre jusqu'à 30 minutes après le paiement. Si après 2h rien n'a démarré, contacte-nous sur Discord avec ton numéro de commande.</div></div>
+    <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span>Je n'ai pas reçu mes followers, que faire ?</span><span class="faq-ic">+</span></div><div class="faq-a">Vérifie que ton profil est bien en mode public. Si c'est le cas et que la commande est en statut "livré" mais que tu ne vois rien, contacte-nous sur Discord.</div></div>
+    <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span>Puis-je obtenir un remboursement ?</span><span class="faq-ic">+</span></div><div class="faq-a">Les remboursements sont possibles uniquement si la commande n'a pas été livrée. Contacte-nous dans les 48h suivant le paiement via Discord ou par email.</div></div>
+    <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span>Mon abonnement ne s'applique pas correctement ?</span><span class="faq-ic">+</span></div><div class="faq-a">Assure-toi d'être connecté à ton compte avant de passer commande. Si le problème persiste, contacte-nous sur Discord avec ton email.</div></div>
+    <div class="faq"><div class="faq-q" onclick="this.parentElement.classList.toggle('open')"><span>Comment annuler mon abonnement ?</span><span class="faq-ic">+</span></div><div class="faq-a">Va dans ton espace compte → clique sur "Annuler" à côté de ton abonnement. Il restera actif jusqu'à la fin de la période payée.</div></div>
+  </div>
+
+</div>
+
+<script>
+// Particles
+const canvas = document.getElementById('bgCanvas');
+const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
+resize(); window.addEventListener('resize', resize);
+class P{ constructor(){ this.reset(); } reset(){ this.x=Math.random()*W; this.y=Math.random()*H; this.size=Math.random()*1.2+.3; this.vx=(Math.random()-.5)*.3; this.vy=(Math.random()-.5)*.3; this.pulse=Math.random()*Math.PI*2; } update(){ this.x+=this.vx; this.y+=this.vy; this.pulse+=.015; this.opacity=.15+Math.sin(this.pulse)*.15; if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset(); } draw(){ ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fillStyle=`rgba(88,101,242,${this.opacity})`; ctx.fill(); } }
+for(let i=0;i<60;i++) particles.push(new P());
+function animate(){ ctx.clearRect(0,0,W,H); particles.forEach(p=>{p.update();p.draw()}); requestAnimationFrame(animate); }
+animate();
+
+// Nav login state
+const userData = JSON.parse(localStorage.getItem('user_data') || 'null');
+</script>
+
+<!--Start of Tawk.to Script-->
+<script type="text/javascript">
+var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
+(function(){var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];s1.async=true;s1.src="https://embed.tawk.to/6a0f9d6062b0761c3d8d54a0/1jp6ftgfs";s1.charset="UTF-8";s1.setAttribute("crossorigin","*");s0.parentNode.insertBefore(s1,s0);})();
+</script>
+<!--End of Tawk.to Script-->
+</body>
+</html>

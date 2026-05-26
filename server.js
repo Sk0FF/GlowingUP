@@ -31,8 +31,10 @@ async function initDB() {
     ALTER TABLE orders ADD COLUMN IF NOT EXISTS id_service TEXT;
     CREATE TABLE IF NOT EXISTS admin (
       id SERIAL PRIMARY KEY,
-      email TEXT UNIQUE, password TEXT
+      email TEXT UNIQUE, password TEXT,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
+    ALTER TABLE admin ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
     CREATE TABLE IF NOT EXISTS users (
       id SERIAL PRIMARY KEY,
       email TEXT UNIQUE, password TEXT, name TEXT,
@@ -45,6 +47,17 @@ async function initDB() {
       max_uses INTEGER DEFAULT 9999,
       uses INTEGER DEFAULT 0,
       active INTEGER DEFAULT 1,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+    CREATE TABLE IF NOT EXISTS subscriptions (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER,
+      email TEXT,
+      stripe_customer_id TEXT,
+      stripe_subscription_id TEXT,
+      plan TEXT,
+      status TEXT DEFAULT 'active',
+      current_period_end TIMESTAMP,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     CREATE TABLE IF NOT EXISTS promo_uses (
@@ -230,6 +243,40 @@ app.post('/api/webhook', async (req, res) => {
     await sendTelegramNotif(msg);
   }
 
+  // Handle subscription events
+  if(event.type === 'checkout.session.completed' && s.mode === 'subscription') {
+    const meta = s.metadata;
+    const subscriptionId = s.subscription;
+    const customerId = s.customer;
+    
+    // Get subscription details
+    const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+    const periodEnd = new Date(subscription.current_period_end * 1000);
+    
+    await pool.query(
+      `INSERT INTO subscriptions (user_id, email, stripe_customer_id, stripe_subscription_id, plan, status, current_period_end)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       ON CONFLICT (stripe_subscription_id) DO UPDATE SET status = 'active', current_period_end = $7`,
+      [parseInt(meta.user_id), meta.email, customerId, subscriptionId, meta.plan, 'active', periodEnd]
+    );
+
+    await sendTelegramNotif(`⭐ <b>NOUVEL ABONNEMENT !</b>\n\n👤 <b>Email :</b> ${meta.email}\n📦 <b>Plan :</b> ${meta.plan.toUpperCase()}\n💰 <b>Montant :</b> ${meta.plan === 'pro' ? '14,99€' : '4,99€'}/mois\n⏰ ${new Date().toLocaleString('fr-FR')}`);
+  }
+
+  if(event.type === 'customer.subscription.deleted') {
+    const subId = event.data.object.id;
+    await pool.query('UPDATE subscriptions SET status = $1 WHERE stripe_subscription_id = $2', ['canceled', subId]);
+  }
+
+  if(event.type === 'invoice.payment_succeeded') {
+    const subId = event.data.object.subscription;
+    if(subId) {
+      const subscription = await stripe.subscriptions.retrieve(subId);
+      const periodEnd = new Date(subscription.current_period_end * 1000);
+      await pool.query('UPDATE subscriptions SET status = $1, current_period_end = $2 WHERE stripe_subscription_id = $3', ['active', periodEnd, subId]);
+    }
+  }
+
   res.json({ received: true });
 });
 
@@ -320,6 +367,100 @@ app.get('/api/admin/payments', adminMiddleware, async (req, res) => {
     }));
     res.json(payments);
   } catch (err) { res.status(500).json({ error: err.message }); }
+});
+
+
+// ── SUBSCRIPTION PLANS ──
+const PLANS = {
+  starter: { price_id: 'price_1Tax2OPJLHz5l0M9piuKpwkK', name: 'Starter', discount: 10, amount: 4.99 },
+  pro: { price_id: 'price_1Tax2iPJLHz5l0M967VOEKHC', name: 'Pro', discount: 20, amount: 14.99 }
+};
+
+app.post('/api/subscribe', userMiddleware, async (req, res) => {
+  const { plan } = req.body;
+  if(!PLANS[plan]) return res.status(400).json({ error: 'Plan invalide' });
+  
+  try {
+    const userRes = await pool.query('SELECT * FROM users WHERE id = $1', [req.user.id]);
+    const user = userRes.rows[0];
+    
+    // Create or get Stripe customer
+    let customerId;
+    const subRes = await pool.query('SELECT * FROM subscriptions WHERE user_id = $1', [req.user.id]);
+    
+    if(subRes.rows.length > 0 && subRes.rows[0].stripe_customer_id) {
+      customerId = subRes.rows[0].stripe_customer_id;
+    } else {
+      const customer = await stripe.customers.create({ email: user.email, name: user.name });
+      customerId = customer.id;
+    }
+
+    const session = await stripe.checkout.sessions.create({
+      customer: customerId,
+      payment_method_types: ['card'],
+      line_items: [{ price: PLANS[plan].price_id, quantity: 1 }],
+      mode: 'subscription',
+      success_url: `${process.env.FRONTEND_URL}/compte.html?subscribed=true`,
+      cancel_url: `${process.env.FRONTEND_URL}/tarifs.html`,
+      metadata: { user_id: String(req.user.id), plan, email: user.email }
+    });
+    
+    res.json({ url: session.url });
+  } catch(err) { res.status(500).json({ error: err.message }); }
+});
+
+app.post('/api/cancel-subscription', userMiddleware, async (req, res) => {
+  try {
+    const subRes = await pool.query('SELECT * FROM subscriptions WHERE user_id = $1 AND status = $2', [req.user.id, 'active']);
+    if(!subRes.rows.length) return res.status(404).json({ error: 'Aucun abonnement actif' });
+    const sub = subRes.rows[0];
+    await stripe.subscriptions.update(sub.stripe_subscription_id, { cancel_at_period_end: true });
+    await pool.query('UPDATE subscriptions SET status = $1 WHERE id = $2', ['canceling', sub.id]);
+    res.json({ success: true });
+  } catch(err) { res.status(500).json({ error: err.message }); }
+});
+
+app.get('/api/my-subscription', userMiddleware, async (req, res) => {
+  const result = await pool.query('SELECT * FROM subscriptions WHERE user_id = $1 ORDER BY created_at DESC LIMIT 1', [req.user.id]);
+  res.json(result.rows[0] || null);
+});
+
+app.get('/api/admin/subscriptions', adminMiddleware, async (req, res) => {
+  const result = await pool.query('SELECT s.*, u.name FROM subscriptions s LEFT JOIN users u ON s.user_id = u.id ORDER BY s.created_at DESC');
+  res.json(result.rows);
+});
+
+
+// ── ADMIN MANAGEMENT ──
+app.get('/api/admin/admins', adminMiddleware, async (req, res) => {
+  const result = await pool.query('SELECT id, email, created_at FROM admin ORDER BY id');
+  res.json(result.rows);
+});
+
+app.post('/api/admin/admins', adminMiddleware, async (req, res) => {
+  const { email, password } = req.body;
+  if(!email || !password) return res.status(400).json({ error: 'Champs manquants' });
+  try {
+    const hash = bcrypt.hashSync(password, 10);
+    await pool.query('INSERT INTO admin (email, password) VALUES ($1, $2)', [email, hash]);
+    res.json({ success: true });
+  } catch { res.status(400).json({ error: 'Email déjà utilisé' }); }
+});
+
+app.delete('/api/admin/admins/:id', adminMiddleware, async (req, res) => {
+  // Prevent deleting main admin
+  const main = await pool.query('SELECT id FROM admin WHERE email = $1', [process.env.ADMIN_EMAIL]);
+  if(main.rows[0]?.id == req.params.id) return res.status(400).json({ error: 'Impossible de supprimer le compte principal' });
+  await pool.query('DELETE FROM admin WHERE id = $1', [req.params.id]);
+  res.json({ success: true });
+});
+
+app.patch('/api/admin/admins/:id/password', adminMiddleware, async (req, res) => {
+  const { password } = req.body;
+  if(!password || password.length < 6) return res.status(400).json({ error: 'Mot de passe trop court' });
+  const hash = bcrypt.hashSync(password, 10);
+  await pool.query('UPDATE admin SET password = $1 WHERE id = $2', [hash, req.params.id]);
+  res.json({ success: true });
 });
 
 // ── TEST ROUTES ──
